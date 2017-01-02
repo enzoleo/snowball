@@ -88,7 +88,7 @@ public:
     }
 
     /* Move camera along the given direction */
-    void move(GLfloat deltaTime, CameraMoveDirection direction)
+    void translate(GLfloat deltaTime, CameraMoveDirection direction)
     {
         // Get the velocity of the movement
         GLfloat velocity = moveSpeed * deltaTime;

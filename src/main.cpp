@@ -283,13 +283,13 @@ void Do_Movement()
 
     // Camera controls
     if (keys[GLFW_KEY_W])
-        camera.move(deltaTime, CAMERA_FORWARD);
+        camera.translate(deltaTime, CAMERA_FORWARD);
     if (keys[GLFW_KEY_S])
-        camera.move(deltaTime, CAMERA_BACKWARD);
+        camera.translate(deltaTime, CAMERA_BACKWARD);
     if (keys[GLFW_KEY_A])
-        camera.move(deltaTime, CAMERA_LEFT);
+        camera.translate(deltaTime, CAMERA_LEFT);
     if (keys[GLFW_KEY_D])
-        camera.move(deltaTime, CAMERA_RIGHT);
+        camera.translate(deltaTime, CAMERA_RIGHT);
     if (keys[GLFW_KEY_LEFT])
         if (snowball.getCurPosition().x > -3.0f)
             snowball.setPositionX(snowball.getCurPosition().x - 0.2f);
