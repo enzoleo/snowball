@@ -131,8 +131,8 @@ void renderScene()
 
     Square pathSquare(path_buffer);
 
-    glm::mat4 projection = glm::perspective(camera.Zoom, (float)screenWidth / (float)screenHeight, 0.1f, 100.0f);
-    glm::mat4 view = camera.GetViewMatrix();
+    glm::mat4 projection = glm::perspective(camera.getFovy(), (float)screenWidth / (float)screenHeight, 0.1f, 100.0f);
+    glm::mat4 view = camera.getViewMat();
     glm::mat4 model;
     //model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
     model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
@@ -283,13 +283,13 @@ void Do_Movement()
 
     // Camera controls
     if (keys[GLFW_KEY_W])
-        camera.ProcessKeyboard(FORWARD, deltaTime);
+        camera.move(deltaTime, CAMERA_FORWARD);
     if (keys[GLFW_KEY_S])
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
+        camera.move(deltaTime, CAMERA_BACKWARD);
     if (keys[GLFW_KEY_A])
-        camera.ProcessKeyboard(LEFT, deltaTime);
+        camera.move(deltaTime, CAMERA_LEFT);
     if (keys[GLFW_KEY_D])
-        camera.ProcessKeyboard(RIGHT, deltaTime);
+        camera.move(deltaTime, CAMERA_RIGHT);
     if (keys[GLFW_KEY_LEFT])
         if (snowball.getCurPosition().x > -3.0f)
             snowball.setPositionX(snowball.getCurPosition().x - 0.2f);
@@ -326,12 +326,12 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     lastX = xpos;
     lastY = ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    camera.rotate(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    camera.ProcessMouseScroll(yoffset);
+    camera.zoom(yoffset);
 }
 
 #pragma endregion
