@@ -102,15 +102,16 @@ public:
     ** Change the front direction by editting the Eular angles */
     void rotate(GLfloat yaw_offset, GLfloat pitch_offset)
     {
-        yaw_offset *= mouseSensitivity;
-        pitch_offset *= mouseSensitivity;
+        // Change the Eular angles of this camera configuration
+        yaw += yaw_offset * mouseSensitivity;
+        pitch += pitch_offset * mouseSensitivity;
 
-        yaw   += yaw_offset;
-        pitch += pitch_offset;
-
+        // Update the pitch! Make sure the pitch is in right area
+        // Attention: the value of @yaw has no limitation!
         if (pitch > 89.0f) pitch = 89.0f;
         if (pitch < -89.0f) pitch = -89.0f;
 
+        // Regenerate the view settings
         genCameraView();
     }
 
