@@ -28,7 +28,7 @@ public:
           ambient(_ambient),
           diffuse(_diffuse),
           specular(_specular)
-    {
+    { // Constructor
     }
 
     /* Bind light with shader
@@ -44,15 +44,34 @@ public:
         shader.uninstall();
     }
 
+    /* Returns the private members
+    ** We set the light settings private, because they are not supposed to be editted easily
+    ** If they need to be editted, call the `set*` functions, which makes sure you edit them
+    ** on purpose, instead of unconsciously. */
     const glm::vec3 getDirection() { return direction; }
     const glm::vec3 getAmbient() { return ambient; }
     const glm::vec3 getDiffuse() { return diffuse; }
     const glm::vec3 getSpecular() { return specular; }
 
+    /* Reset some private members */
+    void setDirection(const glm::vec3& _direction) { direction = _direction; }
+    void setAmbient(const glm::vec3& _ambient) { ambient = _ambient; }
+    void setDiffuse(const glm::vec3& _diffuse) { diffuse = _diffuse; }
+    void setSpecular(const glm::vec3& _specular) { specular = _specular; }
+
 private:
+
+    /* The direction of the light
+    ** No matter what kind the light has (parallel or spot)*/
     glm::vec3 direction;
+
+    /* The ambient reflection coefficients of light */
     glm::vec3 ambient;
+
+    /* The diffuse reflection coefficients of light */
     glm::vec3 diffuse;
+
+    /* The specular reflection coefficients of light */
     glm::vec3 specular;
 };
 

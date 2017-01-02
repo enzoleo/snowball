@@ -210,12 +210,14 @@ public:
              GLint _slices = 40,
              GLint _stacks = 40,
              GLfloat _rotAngle = 0.0f,
-             GLfloat _speed = 0.2f, 
-             GLfloat _accelerator = 0.0005f)
+             GLfloat _speed = 12.0f, 
+             GLfloat _accelerator = 1.2f,
+             GLfloat _meltSpeed = 0.01f)
         : Ball(_radius, _slices, _stacks),
           rotAngle(_rotAngle),
           speed(_speed),
-          accelerator(_accelerator)
+          accelerator(_accelerator),
+          meltSpeed(_meltSpeed)
     {
         curPosition.y = radius;
         curPosition.z = radius * 20.0f / 5;
@@ -227,7 +229,8 @@ public:
     const GLfloat getSpeed() { return speed; }
     const GLfloat getAccelerator() { return accelerator; }
     const GLfloat getRotAngle() { return rotAngle; }
-    const GLfloat getRotSpeed() { return (180.0f * speed) / (3.14 * radius); }
+    const GLfloat getRotSpeed() { return speed / glm::radians(radius); }
+    const GLfloat getMeltSpeed() { return meltSpeed; }
 
     /* Modify the value of private members
     ** Notice that the radius of snow ball is always being changing.
@@ -235,6 +238,7 @@ public:
     void setSpeed(const GLfloat _speed) { speed = _speed; }
     void setAccelerator(const GLfloat _accelerator) { accelerator = _accelerator; }
     void setRotAngle(const GLfloat _rotAngle) { rotAngle = _rotAngle; }
+    void setMeltSpeed(const GLfloat _meltSpeed) { meltSpeed = _meltSpeed; }
     void setPositionX(const GLfloat _x) { curPosition.x = _x; }
     void setPositionY(const GLfloat _y) { curPosition.y = _y; }
     void setPositionZ(const GLfloat _z) { curPosition.z = _z; }
@@ -282,6 +286,10 @@ private:
     ** PHYSICS MODEL.
     ** Associated variable: @speed */
     GLfloat accelerator;
+
+    /* The meltSpeed of Snowball
+    ** The snowball is always being melting! */
+    GLfloat meltSpeed;
 
     /* The sphere texture of this ball
     ** You can load different textures onto the sphere.

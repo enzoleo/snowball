@@ -163,7 +163,7 @@ void renderScene()
     // Increase rotation speed
     GLfloat rotAngle = snowball.getRotAngle();
     GLfloat rotSpeed = snowball.getRotSpeed();
-    snowball.setRotAngle(rotAngle + rotSpeed);
+    snowball.setRotAngle(rotAngle + rotSpeed * deltaTime);
 
     //-----------------------------------------------------------------------------------
 
@@ -171,9 +171,9 @@ void renderScene()
     {
         GLfloat speed = snowball.getSpeed();
         GLfloat accelerator = snowball.getAccelerator();
-        snowball.setPositionZ(currentZ - speed);
-        snowball.setSpeed(speed + accelerator);
-        snowball.setRadius(snowball.getRadius() - 0.0001f);
+        snowball.setPositionZ(currentZ - speed * deltaTime);
+        snowball.setSpeed(speed + accelerator * deltaTime);
+        snowball.setRadius(snowball.getRadius() - snowball.getMeltSpeed() * deltaTime);
     }
 
     // Get barriers' parameters

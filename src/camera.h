@@ -40,13 +40,13 @@ public:
     ** of this front direction is implemented in the function `genCameraView`.
     ** DEFAULT: the front direction is (0.0f, 0.0f, -1.0f).
     ******************/
-    Camera(glm::vec3 _position = glm::vec3(0.0f, 0.0f, 0.0f),
-           glm::vec3 _up = glm::vec3(0.0f, 1.0f, 0.0f),
-           GLfloat _yaw = -90.0f,
-           GLfloat _pitch = 0.0f,
-           GLfloat _moveSpeed = 3.0f,
-           GLfloat _mouseSensitivity = 0.25f,
-           GLfloat _fovy = 45.0f)
+    Camera(const glm::vec3& _position = glm::vec3(0.0f, 0.0f, 0.0f),
+           const glm::vec3& _up = glm::vec3(0.0f, 1.0f, 0.0f),
+           const GLfloat _yaw = -90.0f,
+           const GLfloat _pitch = 0.0f,
+           const GLfloat _moveSpeed = 3.0f,
+           const GLfloat _mouseSensitivity = 0.25f,
+           const GLfloat _fovy = 45.0f)
         : position(_position),
           up(_up),
           yaw(_yaw),
@@ -75,7 +75,7 @@ public:
     const GLfloat getFovy() { return fovy; }
 
     /* Reset some private members */
-    void setPosition(const glm::vec3 _position) { position = _position; }
+    void setPosition(const glm::vec3& _position) { position = _position; }
     void setMoveSpeed(const GLfloat _moveSpeed) { moveSpeed = _moveSpeed; }
     void setMouseSensitivity(const GLfloat _mouseSensitivity) { mouseSensitivity = _mouseSensitivity; }
     void setFovy(const GLfloat _fovy) { fovy = _fovy; }
