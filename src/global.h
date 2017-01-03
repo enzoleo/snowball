@@ -112,9 +112,9 @@ Model grass;
 
 //Camera camera(glm::vec3(0,0,5));
 Camera camera(
-    0.0f, 5.0f, 20.0f,
-    0.0f, 1.0f, 0.0f,
-    -90.0f, 6.0f
+    glm::vec3(0.0f, 5.0f, 20.0f),
+    glm::vec3(0.0f, 1.0f, 0.0f),
+    -90.0f, 0.0f
 );
 bool keys[1024];
 GLfloat lastX = 400, lastY = 300;

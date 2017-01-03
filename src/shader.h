@@ -86,8 +86,8 @@ public:
         // Delete the shaders as they're linked into our program now and no longer necessery
         glDeleteShader(vertex);
         glDeleteShader(fragment);
-        free(vert_shader_code);
-        free(frag_shader_code);
+        free(vert_shader_code); vert_shader_code = NULL;
+        free(frag_shader_code); frag_shader_code = NULL;
 
         // If geometry shader exists
         if (geom_shader_code)
@@ -99,6 +99,7 @@ public:
             glAttachShader(program, geometry);
             glDeleteShader(geometry);
             free(geom_shader_code);
+            geom_shader_code = NULL;
         }
 
         // Link shader program and compile GLSL program
@@ -123,7 +124,7 @@ public:
             glUseProgram(0);
             install_flag = false;
         } // Else print a WARNING to console
-        else printf("WARNING: No shader INSTALLED!\n");
+        else fprintf(stderr, "WARNING: No shader INSTALLED!\n");
     }
 
     const shaderProgType getProgram()
@@ -143,7 +144,7 @@ private:
         FILE *shader_in = fopen(path, "rb");
         if (!shader_in && compile_option != GEOMETRY)
         { // Vertex or fragment shader file opening error
-            printf("ERROR: Cannot open VERTEX or FRAGMENT shader file.\n");
+            fprintf(stderr, "ERROR: Cannot open VERTEX or FRAGMENT shader file.\n");
             exit(1);
         }
 
@@ -157,7 +158,14 @@ private:
             fseek(shader_in, 0, SEEK_END);
             int shader_in_len = ftell(shader_in);
             shader_code = (char*)malloc(sizeof(char) * shader_in_len);
-            memset(shader_code, 0, shader_in_len + 1);
+
+            // Allocation failed
+            if(!shader_code)
+            {
+                fprintf(stderr, "ERROR: Allocation failed!\n");
+                exit(1);
+            }
+            *(shader_code + shader_in_len) = 0;
 
             // Read the source code to our string (pointer)
             fseek(shader_in, 0, SEEK_SET);
@@ -187,6 +195,11 @@ private:
         // Compilation variables to report error log
         GLint compile_err;
         char* err_info_log = (char*)malloc(1024 * sizeof(char));
+        if (!err_info_log)
+        {
+            fprintf(stderr, "ERROR: Allocation failed!\n");
+            exit(1);
+        }
 
         // Compile a shader program
         if (compile_option != PROGRAM)
@@ -195,7 +208,7 @@ private:
             if (!compile_err)
             { // Output error log
                 glGetShaderInfoLog(shader_program, sizeof(err_info_log), NULL, err_info_log);
-                printf("ERROR: %s\n%s\n", enum_type_map[compile_option], err_info_log);
+                fprintf(stderr, "ERROR: %s\n%s\n", enum_type_map[compile_option], err_info_log);
             }
         } // Else compile vertex or fragment or geometry shader
         else
@@ -204,7 +217,7 @@ private:
             if (!compile_err)
             { // Output error log
                 glGetProgramInfoLog(shader_program, 1024, NULL, err_info_log);
-                printf("ERROR: %s\n%s\n", enum_type_map[compile_option], err_info_log);
+                fprintf(stderr, "ERROR: %s\n%s\n", enum_type_map[compile_option], err_info_log);
             }
         }
     }
