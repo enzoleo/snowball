@@ -25,6 +25,7 @@ typedef GLfloat** NoiseType;
 /* The algorithms to generate height map */
 enum GeneratorAlgorithm
 {
+    NONE_ALGORITHM,
     PERLIN_NOISE_ALGORITHM,
     CIRCLE_STRIKE_ALGORITHM
 };
@@ -39,19 +40,27 @@ struct HeightMapParams : public MapParams
     typedef typename MapParams::iterator _iter;
 
     /* Default constructor & Constructor */
-    HeightMapParams(GeneratorAlgorithm _algorithm,
-                    const std::string& _heightMapPath = "./terrains/")
+    HeightMapParams(GeneratorAlgorithm _algorithm = NONE_ALGORITHM,
+                    const std::string& _heightMapPath = "./terrains/",
+                    GLuint _width = 256,
+                    GLuint _height = 256)
     {
         // Malloc space and assignment
         std::string* _path_ptr = new std::string;
-        *_path_ptr = _heightMapPath;
-
         GeneratorAlgorithm* _agrtm_ptr = new GeneratorAlgorithm;
+        GLuint* _width_ptr = new GLuint;
+        GLuint* _height_ptr = new GLuint;
+
+        *_path_ptr = _heightMapPath;
         *_agrtm_ptr = _algorithm;
+        *_width_ptr = _width;
+        *_height_ptr = _height;
 
         // Insert pair to this map
-        (*this)["heightMapPath"] = reinterpret_cast<void*>(_path_ptr);
         (*this)["algorithm"] = reinterpret_cast<void*>(_agrtm_ptr);
+        (*this)["heightMapPath"] = reinterpret_cast<void*>(_path_ptr);
+        (*this)["width"] = reinterpret_cast<void*>(_width_ptr);
+        (*this)["height"] = reinterpret_cast<void*>(_height_ptr);
     }
 
     /* Functions to get value with a key */
@@ -88,8 +97,13 @@ class HeightMapGeneratorBase
 public:
 
     /* Default constructor & Constructor */
-    HeightMapGeneratorBase(const std::string& _heightMapPath = "./terrains/")
-        : heightMapPath(_heightMapPath)
+    HeightMapGeneratorBase(const std::string& _heightMapPath = "./terrains/",
+                           GLuint _width = 256,
+                           GLuint _height = 256)
+        : heightMapPath(_heightMapPath),
+          width(_width),
+          height(_height),
+          algorithm(NONE_ALGORITHM)
     { // Do nothing here
     }
 
@@ -98,6 +112,9 @@ public:
     { // Find value with given key
         HeightMapParams params_copy = params;
         heightMapPath = params_copy.get_param<std::string>("heightMapPath", "./terrains/");
+        width = params_copy.get_param<GLuint>("width", 256);
+        height = params_copy.get_param<GLuint>("height", 256);
+        algorithm = params_copy.get_param<GeneratorAlgorithm>("algorithm", NONE_ALGORITHM);
     }
 
     /* Returns the private members
@@ -105,9 +122,15 @@ public:
     ** editted easily. If they need to be editted, call the `set*` functions, which makes
     ** sure you edit them on purpose, instead of unconsciously. */
     const std::string& getPath() { return heightMapPath; }
+    const GeneratorAlgorithm getAlgorithm() { return algorithm; }
+    const GLuint getWidth() { return width; }
+    const GLuint getHeight() { return height; }
 
     /* Reset some private members */
     void setPath(const std::string& path) { heightMapPath = path; }
+
+    /* Virtual functions */
+    virtual void generate(const char* filename) = 0;
 
 protected:
 
@@ -115,8 +138,6 @@ protected:
     ** DEFAULT directory: "./terrains/"
     ** The height map will be saved into this directory */
     GLint save(ImagePointer heightMapData,
-               GLint width,
-               GLint height,
                const std::string& filename)
     {
         // Get the absolute path of the height map file
@@ -165,6 +186,14 @@ protected:
     ** The directory of height map.
     ** Default: "./terrains/" */
     std::string heightMapPath;
+
+    /* PRIVATE MEMBER
+    ** The algorithm used */
+    GeneratorAlgorithm algorithm;
+
+    /* PRIVATE MEMBERS 
+    ** The width and height of the height map */
+    GLuint width, height;
 };
 
 /* STRUCT: parameters (circle strike algorithms) */
@@ -177,10 +206,12 @@ struct CircleStrikeParams : public HeightMapParams
                        const std::string& _heightMapPath = "./terrains/")
         : HeightMapParams(CIRCLE_STRIKE_ALGORITHM, _heightMapPath)
     {
-        // New several pointers and do assignments
+        // New several pointers
         GLfloat* radius_ptr = new GLfloat;
         GLfloat* for_flx_ptr = new GLfloat;
         GLfloat* back_flx_ptr = new GLfloat;
+
+        // Do assignments of each variable
         *radius_ptr = _circleRadius;
         *for_flx_ptr = _forwardFlx;
         *back_flx_ptr = _backwardFlx;
@@ -202,19 +233,34 @@ public:
     CircleStrikeGenerator(GLfloat _circleRadius = 50.0f,
                           GLfloat _forwardFlx = 1.0f,
                           GLfloat _backwardFlx = -1.0f,
+                          GLuint _iterations = 100,
+                          GLuint _stableIterNum = 100,
+                          GLfloat _maxCrash = 1.0f,
+                          GLfloat _minCrash = 0.1f,
                           const std::string& _heightMapPath = "./terrains/")
         : HeightMapGeneratorBase(_heightMapPath),
           circleRadius(_circleRadius),
           forwardFlx(_forwardFlx),
           backwardFlx(_backwardFlx),
-          algorithm(CIRCLE_STRIKE_ALGORITHM)
+          iterations(_iterations),
+          stableIterNum(_stableIterNum),
+          maxCrash(_maxCrash),
+          minCrash(_minCrash)
     { // Do nothing here
+        algorithm = CIRCLE_STRIKE_ALGORITHM;
     }
 
     /* Constructor with specific parameters */
-    CircleStrikeGenerator(const CircleStrikeParams& params)
+    CircleStrikeGenerator(const CircleStrikeParams& params,
+                          GLuint _iterations = 100,
+                          GLuint _stableIterNum = 100,
+                          GLfloat _maxCrash = 1.0f,
+                          GLfloat _minCrash = 0.1f)
         : HeightMapGeneratorBase(params),
-          algorithm(CIRCLE_STRIKE_ALGORITHM)
+          iterations(_iterations),
+          stableIterNum(_stableIterNum),
+          maxCrash(_maxCrash),
+          minCrash(_minCrash)
     { // Find value with given key
         CircleStrikeParams params_copy = params;
         circleRadius = params_copy.get_param<GLfloat>("circleRadius", 50.0f);
@@ -229,33 +275,27 @@ public:
     const GLfloat getCircleRadius() { return circleRadius; }
     const GLfloat getForwardFlx() { return forwardFlx; }
     const GLfloat getBackwardFlx() { return backwardFlx; }
-    const GeneratorAlgorithm getAlgorithm() { return algorithm; }
+    const GLuint getIterations() { return iterations; }
+    const GLuint getStableIterNum() { return stableIterNum; }
+    const GLfloat getMaxCrash() { return maxCrash; }
+    const GLfloat getMinCrash() { return minCrash; }
 
     /* Reset some private members */
     void setCircleRadius(const GLfloat _circleRadius) { circleRadius = _circleRadius; }
     void setForwardFlx(const GLfloat _forwardFlx) { forwardFlx = _forwardFlx; }
     void setBackwardFlx(const GLfloat _backwardFlx) { backwardFlx = _backwardFlx; }
+    void setIterations(const GLuint _iterations) { iterations = _iterations; }
+    void setStableIterNum(const GLuint _stableIterNum) { stableIterNum = _stableIterNum; }
+    void setMaxCrash(const GLfloat _maxCrash) { maxCrash = _maxCrash; }
+    void setMinCrash(const GLfloat _minCrash) { minCrash = _minCrash; }
 
     /******************************************
     ** GENERATE function: 
     **     The function generates a height map and save it to default directory.
     **
     ** @param filename: The name of the height map.
-    ** @param width: Of course the width of the height map (pixels)
-    ** @param height: Of course the height of the height map (pixels)
-    ** @param iterations: The iterations of operating steps the algorithm will do.
-    ** @param stableInterNum: The effection factor will decrease until @stableInterNum
-    **     iterations the algorithm has done.
-    ** @param maxCrash: The maximum crash (when iterations begin).
-    ** @param minCrash: The minimum crash (when iterations end).
     ******************************************/
-    void generate(const char* filename,
-                  GLint width,
-                  GLint height,
-                  GLint iterations,
-                  GLint stableIterNum = 100,
-                  GLfloat maxCrash = 1.0f,
-                  GLfloat minCrash = 0.1f)
+    void generate(const char* filename)
     {
         // Set seed for random number generator
         srand(time(0));
@@ -350,24 +390,34 @@ public:
         }
         
         // FINAL step: save the height map
-        save(heightMapData, width, height, std::string(filename));
+        save(heightMapData, std::string(filename));
     }
 
 protected:
 
-    /* PRIVATE MEMBER
+    /* PROTECTED MEMBER
     ** The radius of the circles */
     GLfloat circleRadius;
 
-    /* PRIVATE MEMBERS
+    /* PROTECTED MEMBERS
     ** Determines the FLEXIBILITY of the plane when it is striked by a
     ** circle from forward or backward.
     ** NOTE: the value of them is supposed to be [0, +infty) */
     GLfloat forwardFlx, backwardFlx;
 
-    /* PRIVATE MEMBER
-    ** The algorithm used */
-    GeneratorAlgorithm algorithm;
+    /* PROTECTED MEMBER
+    ** The iterations of operating steps the algorithm will do. */
+    GLuint iterations;
+
+    /* PROTECTED MEMBER
+    ** The effection factor will decrease until @stableIterNum iterations
+    ** the algorithm has done. */
+    GLuint stableIterNum;
+    
+    /* PROTECTED MEMBERS
+    ** @param maxCrash: The maximum crash (when iterations begin).
+    ** @param minCrash: The minimum crash (when iterations end). */
+    GLfloat maxCrash, minCrash;
 
 };
 
@@ -376,13 +426,13 @@ struct PerlinNoiseParams : public HeightMapParams
 {
     /* Default constructor & Constructor */
     PerlinNoiseParams(GLfloat _smooth = 2.0f,
-                      GLint _persistence = 2,
+                      GLuint _persistence = 2,
                       const std::string& _heightMapPath = "./terrains/")
         : HeightMapParams(PERLIN_NOISE_ALGORITHM, _heightMapPath)
     {
         // New several pointers and do assignments
         GLfloat* smth_ptr = new GLfloat;
-        GLint* pers_ptr = new GLint;
+        GLuint* pers_ptr = new GLuint;
         *smth_ptr = _smooth;
         *pers_ptr = _persistence;
 
@@ -400,23 +450,26 @@ public:
 
     /* Default constructor & Constructor */
     PerlinNoiseGenerator(GLfloat _smooth = 2.0f,
-                         GLint _persistence = 2,
+                         GLuint _persistence = 2,
+                         GLuint octaves = 8,
                          const std::string& _heightMapPath = "./terrains/")
         : HeightMapGeneratorBase(_heightMapPath),
           smooth(_smooth),
           persistence(_persistence),
-          algorithm(PERLIN_NOISE_ALGORITHM)
+          octaves(8)
     { // Do nothing here
+        algorithm = PERLIN_NOISE_ALGORITHM;
     }
 
     /* Constructor with specific parameters */
-    PerlinNoiseGenerator(const PerlinNoiseParams& params)
+    PerlinNoiseGenerator(const PerlinNoiseParams& params,
+                         GLuint octaves = 8)
         : HeightMapGeneratorBase(params),
-          algorithm(PERLIN_NOISE_ALGORITHM)
+          octaves(8)
     { // Find value with given key
         PerlinNoiseParams params_copy = params;
         smooth = params_copy.get_param<GLfloat>("smooth", 2.0f);
-        persistence = params_copy.get_param<GLint>("persistence", 2);
+        persistence = params_copy.get_param<GLuint>("persistence", 2);
     }
 
     /* Returns the private members
@@ -424,32 +477,24 @@ public:
     ** editted easily. If they need to be editted, call the `set*` functions, which makes
     ** sure you edit them on purpose, instead of unconsciously. */
     const GLfloat getSmooth() { return smooth; }
-    const GLint getPersistence() { return persistence; }
-    const GeneratorAlgorithm getAlgorithm() { return algorithm; }
+    const GLuint getPersistence() { return persistence; }
+    const GLuint getOctaves() { return octaves; }
 
     /* Reset some private members */
     void setSmooth(const GLfloat _smooth) { smooth = _smooth; }
-    void setPersistence(const GLint _persistence) { persistence = _persistence; }
+    void setPersistence(const GLuint _persistence) { persistence = _persistence; }
+    void setOctaves(const GLuint _octaves) { octaves = _octaves; }
 
     /******************************************
     ** GENERATE function: 
     **     The function generates a height map and save it to default directory.
     **
     ** @param filename: The name of the height map.
-    ** @param width: Of course the width of the height map (pixels)
-    ** @param height: Of course the height of the height map (pixels)
-    ** @param octaves: A parameter about frequency. The value of this parameter @octave must
-    **     be an positive integer with 2^n form, which means the actual frequency (f) is 2^n
-    **     times the reference frequency (f0). This is an electronical concept. To learn more
-    **     about this, take a look at `https://en.wikipedia.org/wiki/Octave_(electronics)`.
     ******************************************/
-    void generate(const char* filename,
-                  GLint width,
-                  GLint height,
-                  GLint octaves)
+    void generate(const char* filename)
     {
         // Generate white noise
-        NoiseType whiteNoise = generateWhiteNoise(width, height);
+        NoiseType whiteNoise = generateWhiteNoise();
         // Declare smooth noise and perlin noise
         NoiseType* smoothNoises;
         NoiseType perlinNoise;
@@ -468,7 +513,7 @@ public:
                  noise_ptr != smoothNoises + octaves;
                  noise_ptr++, octave_num++)
             {
-                *noise_ptr = generateSmoothNoise(whiteNoise, width, height, octave_num);
+                *noise_ptr = generateSmoothNoise(whiteNoise, octave_num);
             }
 
             // Initialise the perlin noise matrix
@@ -519,7 +564,7 @@ public:
         }
 
         // FINAL step: save the height map
-        save(perlinNoise, width, height, std::string(filename));
+        save(perlinNoise, std::string(filename));
     }
 
 protected:
@@ -534,7 +579,7 @@ protected:
     ** 
     ** Actually this function generates a random matrix with width * height size
     ******************************************/
-    NoiseType generateWhiteNoise(GLint width, GLint height)
+    NoiseType generateWhiteNoise()
     {
         // Set seed of random number generator
         srand(time(0));
@@ -575,9 +620,7 @@ protected:
     ** Actually this function generates a random matrix with width * height size
     ******************************************/
     NoiseType generateSmoothNoise(NoiseType whiteNoise, 
-                                  GLint width,
-                                  GLint height,
-                                  GLint octave)
+                                  GLuint octave)
     {
         // Calculate the period and frequency
         GLint period = pow(persistence, octave);
@@ -643,44 +686,72 @@ protected:
         return (top + bottom) / 2.0f + (top - bottom) * cos(factor * M_PI) / 2.0f;
     }
 
-    /* PRIVATE MEMBER
+    /* PROTECTED MEMBER
     ** The smooth variable of the height map generator
     ** The bigger this value is, the smoother height map will be. */
     GLfloat smooth;
 
-    /* The persistence coefficients
+    /* PROTECTED MEMBER
+    ** The persistence coefficients
     ** Used in smooth noise generator */
-    GLint persistence;
+    GLuint persistence;
 
-    /* PRIVATE MEMBER
-    ** The algorithm used */
-    GeneratorAlgorithm algorithm;
+    /* PROTECTED MEMBER
+    ** @param octaves: A parameter about frequency. The value of this parameter @octave must
+    **     be an positive integer with 2^n form, which means the actual frequency (f) is 2^n
+    **     times the reference frequency (f0). This is an electronical concept. To learn more
+    **     about this, take a look at `https://en.wikipedia.org/wiki/Octave_(electronics)`. */
+    GLuint octaves;
 };
 
-/*template<class ParamsType>
+/* CLASS: All algorithms */
 class HeightMapGenerator
-    : private CircleStrikeGenerator,
-      private PerlinNoiseGenerator
 {
 public:
 
-    // Default constructor & Constructor
-    HeightMapGenerator(const ParamsType& params)
+    /* Default constructor & Constructor
+    ** Using parameters of Circle Strike Algorithm */
+    HeightMapGenerator(const CircleStrikeParams& params,
+                       GLuint _iterations = 100,
+                       GLuint _stableIterNum = 100,
+                       GLfloat _maxCrash = 1.0f,
+                       GLfloat _minCrash = 0.1f)
     {
-        GeneratorAlgorithm _agrtm = params.get_param<GeneratorAlgorithm>("algorithm");
-        if (_agrtm == CIRCLE_STRIKE_ALGORITHM)
-            CircleStrikeGenerator(params);
-        else if (_agrtm == PERLIN_NOISE_ALGORITHM)
-            PerlinNoiseGenerator(params);
+        _base_generator = new CircleStrikeGenerator(
+            params, _iterations, _stableIterNum, _maxCrash, _minCrash);
+        // Copy the parameters        
+        _generator_params = params;
     }
 
+    /* Default constructor & Constructor
+    ** Using parameters of Perlin Noise Algorithm */
+    HeightMapGenerator(const PerlinNoiseParams& params,
+                       GLuint octaves = 8)
+    {
+        _base_generator = new PerlinNoiseGenerator(params, octaves);
+        // Copy the parameters
+        _generator_params = params;
+    }
+
+    /* Function to return private member: @_generator_params */
+    HeightMapParams getParams() { return _generator_params; }
+
+    /* Generate height map and save it */
+    void generate(const char* filename)
+    {
+        _base_generator->generate(filename);
+    }
 
 private:
 
+    /* IMPORTANT PRIVATE MEMBER
+    ** This pointer saves the address of one specific generator
+    ** using algorithm in @_generator_params */
+    HeightMapGeneratorBase* _base_generator;
+
     /* PRIVATE MEMBER
-    ** The algorithm used
-    ** This member will inherit one of those in father classes 
-    GeneratorAlgorithm algorithm;
-};*/
+    ** The parameters including specific algorithm */
+    HeightMapParams _generator_params;
+};
 
 #endif
