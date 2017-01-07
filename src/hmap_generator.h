@@ -18,6 +18,9 @@
 #include <map>
 #include <SOIL/SOIL.h>
 
+#define _ALLOCATION_FAILED_   1
+#define _VECTOR_ILLEGAL_SIZE_ 2
+
 /* The data type of image pointer and noise */
 typedef GLfloat** ImagePointer;
 typedef GLfloat** NoiseType;
@@ -166,7 +169,7 @@ protected:
         catch(const std::bad_alloc& err)
         { // Catch the allocation error
             fprintf(stderr, "ERROR: Allocation failed!\n");
-            exit(1);
+            exit(_ALLOCATION_FAILED_);
         }
 
         // Use SOIL library to save height map
@@ -321,7 +324,7 @@ public:
         catch(const std::bad_alloc& err)
         { // Catch the allocation error
             fprintf(stderr, "ERROR: Allocation failed!\n");
-            exit(1);
+            exit(_ALLOCATION_FAILED_);
         }
 
         // Parameter @manValue records the maximum or minimum height
@@ -533,7 +536,7 @@ public:
         catch(const std::bad_alloc& err)
         { // Catch the allocation error
             fprintf(stderr, "ERROR: Allocation failed!\n");
-            exit(1);
+            exit(_ALLOCATION_FAILED_);
         }
 
         // The standard amplitude and the sum of all aplitudes
@@ -602,7 +605,7 @@ protected:
         catch(const std::bad_alloc& err)
         { // Catch the allocation error
             fprintf(stderr, "ERROR: Allocation failed!\n");
-            exit(1);
+            exit(_ALLOCATION_FAILED_);
         }
 
         return whiteNoise;
@@ -674,7 +677,7 @@ protected:
         catch(const std::bad_alloc& err)
         { // Catch the allocation error
             fprintf(stderr, "ERROR: Allocation failed!\n");
-            exit(1);
+            exit(_ALLOCATION_FAILED_);
         }
 
         return smoothNoise;

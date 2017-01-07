@@ -31,8 +31,8 @@ public:
           slices(_slices), 
           stacks(_stacks)
     {
-        genVertCord();
-        genUVCord();
+        genVertCoord();
+        genUVCoord();
     }
 
     /* Return private members
@@ -43,9 +43,9 @@ public:
 
     /* Reset some private members
     ** Regenerate the coordinates of vertices if you reset these members */
-    void setRadius(const GLfloat _radius) { radius = _radius; genVertCord(); genUVCord(); }
-    void setSlices(const GLint _slices) { slices = _slices; genVertCord(); genUVCord(); }
-    void setStacks(const GLint _stacks) { stacks = _stacks; genVertCord(); genUVCord(); }
+    void setRadius(const GLfloat _radius) { radius = _radius; genVertCoord(); genUVCoord(); }
+    void setSlices(const GLint _slices) { slices = _slices; genVertCoord(); genUVCoord(); }
+    void setStacks(const GLint _stacks) { stacks = _stacks; genVertCoord(); genUVCoord(); }
     
     /* Reset all private members */
     void reset(GLdouble _radius,
@@ -55,8 +55,8 @@ public:
         radius = _radius;
         slices = _slices;
         stacks = _stacks;
-        genVertCord();
-        genUVCord();
+        genVertCoord();
+        genUVCoord();
     }
 
     /* Bind vertex data buffers
@@ -123,7 +123,7 @@ protected:
 
     /* PRIVATE MEMBER:
     ** Generate vertex coordinates */
-    void genVertCord()
+    void genVertCoord()
     {
         // A fragment is determined by its two endpoints (6 coordinates)
         // The number of vertices is determined by @slices and @stacks
@@ -156,7 +156,7 @@ protected:
 
     /* PRIVATE MEMBER:
     ** Generate UV coordinates */
-    void genUVCord()
+    void genUVCoord()
     {
         // Notice that the texture image is 2D
         // Each fragment need two 20-points (4 coordinates)
