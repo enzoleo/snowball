@@ -31,7 +31,7 @@ public:
 
     /****************
     ** Default constructor & Constructor
-    ** 
+    **
     ** Notice that the parameters @yaw and @pitch are ANGLE variables.
     ** @param `yaw` determines the horizontal offset of the camera direction
     ** @param `pitch` determines the vertical offset of the camera direction
@@ -44,11 +44,12 @@ public:
            const glm::vec3& _up = glm::vec3(0.0f, 1.0f, 0.0f),
            const GLfloat _yaw = -90.0f,
            const GLfloat _pitch = 0.0f,
-           const GLfloat _moveSpeed = 3.0f,
+           const GLfloat _moveSpeed = 5.0f,
            const GLfloat _mouseSensitivity = 0.25f,
            const GLfloat _fovy = 45.0f)
         : position(_position),
           up(_up),
+          worldUp(_up),
           yaw(_yaw),
           pitch(_pitch),
           moveSpeed(_moveSpeed),
@@ -67,6 +68,7 @@ public:
     const glm::vec3 getPosition() { return position; }
     const glm::vec3 getFront() { return front; }
     const glm::vec3 getUp() { return up; }
+    const glm::vec3 getWorldUp() { return worldUp; }
     const glm::vec3 getRight() { return right; }
     const GLfloat getYaw() { return yaw; }
     const GLfloat getPitch() { return pitch; }
@@ -75,6 +77,7 @@ public:
     const GLfloat getFovy() { return fovy; }
 
     /* Reset some private members */
+    void setWorldUp(const glm::vec3& _worldUp) { worldUp = _worldUp; }
     void setPosition(const glm::vec3& _position) { position = _position; }
     void setMoveSpeed(const GLfloat _moveSpeed) { moveSpeed = _moveSpeed; }
     void setMouseSensitivity(const GLfloat _mouseSensitivity) { mouseSensitivity = _mouseSensitivity; }
@@ -106,7 +109,7 @@ public:
         yaw += yaw_offset * mouseSensitivity;
         pitch += pitch_offset * mouseSensitivity;
 
-        // Update the pitch! Make sure the pitch is in right area
+        // update the pitch! Make sure the pitch is in right area
         // Attention: the value of @yaw has no limitation!
         if (pitch > 89.0f) pitch = 89.0f;
         if (pitch < -89.0f) pitch = -89.0f;
@@ -126,7 +129,7 @@ public:
     }
 
 private:
-    
+
     /* PRIVATE MEMBER:
     ** This function generates the view vectors of the camera
     ** @param front: The front direction of the camera
@@ -141,8 +144,8 @@ private:
         new_front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
         front = glm::normalize(new_front);
 
-        // Update the other two vectors
-        right = glm::normalize(glm::cross(front, up));
+        // update the other two vectors
+        right = glm::normalize(glm::cross(front, worldUp));
         up = glm::normalize(glm::cross(right, front));
     }
 
@@ -159,11 +162,15 @@ private:
     ** Not supposed to be editted in general cases. */
     glm::vec3 up;
 
+    /* The up vector in world space, this vector is used to compute "right" mentioned above 
+    ** This vector is not "up" mentioned above */
+    glm::vec3 worldUp;
+
     /* The right direction of the camera
     ** Determined by @front and @up directions:
     ** The normalized vector of cross of @front and @up vectors */
     glm::vec3 right;
-    
+
     /* EULAR ANGLES
     ** @param `yaw` determines the horizontal offset of the camera direction
     ** @param `pitch` determines the vertical offset of the camera direction
