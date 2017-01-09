@@ -2,7 +2,7 @@
 ** Software License Agreement (GNU GENERAL PUBLIC LICENSE)
 **
 ** Copyright 2016-2017  Peiyu Liao (enzoliao95@gmail.com). All rights reserved.
-** Copyright 2016-2017  Yaohong Wu (wuyaohongdio@gmail.com). All rights reserved.
+** Copyright 2016-2017  Yaohong Wu (). All rights reserved.
 **
 ** LICENSE INFORMATION (GPL)
 ** SEE `LICENSE` FILE.
@@ -13,10 +13,27 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "GL/glew.h"
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+#include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+/* ENUM TYOE
+** The function type pf shader */
+enum shaderFuncType
+{
+    NORMAL,
+    DEPTH,
+    PARTICLE,
+    DEBUG,
+    BILLBOARD
+};
 
 /* ENUM TYPE
-** For compilation option 
+** For compilation option
 ** in private member function `compileErrLog`*/
 enum ShaderCompileOption
 {
@@ -28,7 +45,7 @@ enum ShaderCompileOption
 
 /* Shader type definition */
 typedef GLuint shaderProgType;
-typedef bool shaderInstallType;
+typedef GLboolean shaderInstallType;
 
 /* CLASS: Shader
 ** Used in GLSL-binding */
@@ -44,35 +61,33 @@ public:
 
     /* Constructor with parameters which generates the shader */
     Shader(const char* vertex_shader_path,
-           const char* fragment_shader_path,
-           const char* geometry_shader_path = NULL)
+           const char* fragment_shader_path)
         : install_flag(false)
     {
         reload(vertex_shader_path,
-               fragment_shader_path,
-               geometry_shader_path);
+               fragment_shader_path);
     }
-    
+
     /* Reload function
     ** If you need to load new shaders or reload shaders from other paths,
     ** especially when you declare a new shader object by default constructor
     ** (that means no parameter), this function is provided.*/
     void reload(const char* vertex_shader_path,
-                const char* fragment_shader_path,
-                const char* geometry_shader_path = NULL)
+                const char* fragment_shader_path)
     {
         // Declare file variables
         // These variables are supposed to retrieve the source GLSL code
-        char* vert_shader_code = loadCode(vertex_shader_path, VERTEX);
-        char* frag_shader_code = loadCode(fragment_shader_path, FRAGMENT);
-        char* geom_shader_code = loadCode(geometry_shader_path, GEOMETRY);
-        
+        std::string vs_code = loadCode(vertex_shader_path, VERTEX);
+        std::string fs_code = loadCode(fragment_shader_path, FRAGMENT);
+        const char* vert_shader_code = vs_code.c_str();
+        const char* frag_shader_code = fs_code.c_str();
+
         // Create vertex and fragment Shader from source code string
         // Compile GLSL code and report error.
         shaderProgType vertex = glCreateShader(GL_VERTEX_SHADER);
         shaderProgType fragment = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(vertex, 1, &vert_shader_code, NULL);
-        glShaderSource(fragment, 1, &frag_shader_code, NULL);
+        glShaderSource(vertex, 1, &vert_shader_code, nullptr);
+        glShaderSource(fragment, 1, &frag_shader_code, nullptr);
         glCompileShader(vertex);
         glCompileShader(fragment);
         compileErrLog(vertex, VERTEX);
@@ -86,28 +101,13 @@ public:
         // Delete the shaders as they're linked into our program now and no longer necessery
         glDeleteShader(vertex);
         glDeleteShader(fragment);
-        free(vert_shader_code); vert_shader_code = NULL;
-        free(frag_shader_code); frag_shader_code = NULL;
-
-        // If geometry shader exists
-        if (geom_shader_code)
-        {
-            shaderProgType geometry = glCreateShader(GL_GEOMETRY_SHADER);
-            glShaderSource(geometry, 1, &geom_shader_code, NULL);
-            glCompileShader(geometry);
-            compileErrLog(geometry, GEOMETRY);
-            glAttachShader(program, geometry);
-            glDeleteShader(geometry);
-            free(geom_shader_code);
-            geom_shader_code = NULL;
-        }
 
         // Link shader program and compile GLSL program
         // If error occurs, report it to console
         glLinkProgram(program);
         compileErrLog(program, PROGRAM);
     }
-    
+
     /* Install the current shader */
     void install()
     {
@@ -124,54 +124,89 @@ public:
             glUseProgram(0);
             install_flag = false;
         } // Else print a WARNING to console
-        else fprintf(stderr, "WARNING: No shader INSTALLED!\n");
+        else printf("WARNING: No shader INSTALLED!\n");
     }
 
-    const shaderProgType getProgram()
-    { // Return private member @program
-        return program;
+    /* Returns the private members
+    ** We set the shader settings private, because they are not supposed to be
+    ** editted easily. If they need to be editted, call the `set*` functions, which makes
+    ** sure you edit them on purpose, instead of unconsciously. */
+    const shaderProgType getProgram() { return program; }
+    const shaderFuncType getFuncType() { return func; }
+    const shaderInstallType getInstallFlag() { return install_flag; }
+
+    /* Set some private members */
+    void setFuncType(shaderFuncType _func) { func = _func; }
+    
+    /* Other settings (used in GLSL-shader) */
+    /* Set uniform matrix */
+    void setUniformMatrix4fv(const char* name,
+                             const glm::mat4& matrix)
+    {
+        GLint matrixID = glGetUniformLocation(program, name);
+        glUniformMatrix4fv(matrixID, 1, GL_FALSE, glm::value_ptr(matrix));
+    }
+
+    /* Set uniform3f */
+    void setUniform3f(const char* name,
+                      const glm::vec3& vector)
+    {
+        GLint vectorID = glGetUniformLocation(program, name);
+        glUniform3f(vectorID, vector.x, vector.y, vector.z);
+    }
+
+    /* Set uniform 4f */
+    void setUniform4f(const char* name,
+                      const glm::vec4& vector)
+    {
+        GLint vectorID = glGetUniformLocation(program, name);
+        glUniform4f(vectorID, vector.x, vector.y, vector.z, vector.w);
+    }
+
+    /* Set uniform 1f */
+    void setUniform1f(const char* name,
+                      const float& value)
+    {
+        GLint floatID = glGetUniformLocation(program, name);
+        glUniform1f(floatID, value);
+    }
+
+    /* Set uniform 1i */
+    void setUniform1i(const char* name,
+                      const int& value)
+    {
+        GLint intID = glGetUniformLocation(program, name);
+        glUniform1i(intID, value);
     }
 
 private:
 
     /* Load code string (pointer) from files.
-    ** Return a pointer! 
+    ** Return a pointer!
     ** PRIVATE member only viewed inside this class. */
-    char* loadCode(const char* path, ShaderCompileOption compile_option)
+    std::string loadCode(const char* path, ShaderCompileOption compile_option)
     {
-        // Declare file variables
-        // These variables are supposed to retrieve the source GLSL code
-        FILE *shader_in = fopen(path, "rb");
-        if (!shader_in && compile_option != GEOMETRY)
+        // @param shader_code: The string of shader code
+        // @param shader_file: The string stream of shader code
+        std::string shader_code;
+        std::ifstream shader_file;
+
+        // Throw exceptions (if error occurs)
+        shader_file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+        try
+        { // Open and read code string
+            shader_file.open(path);
+            std::stringstream shader_stream;
+            shader_stream << shader_file.rdbuf();
+            shader_file.close();
+            shader_code = shader_stream.str();
+        }
+        catch(const std::ifstream::failure& err)
         { // Vertex or fragment shader file opening error
-            fprintf(stderr, "ERROR: Cannot open VERTEX or FRAGMENT shader file.\n");
+            fprintf(stderr, "ERROR: Cannot open shader file!\n");
             exit(1);
         }
-
-        // Declare the code string
-        char* shader_code = NULL;
-        // The the shader exists
-        if (shader_in)
-        {
-            // Get the length of the shader source code string
-            // Malloc space of code string (pointer)
-            fseek(shader_in, 0, SEEK_END);
-            int shader_in_len = ftell(shader_in);
-            shader_code = (char*)malloc(sizeof(char) * shader_in_len);
-
-            // Allocation failed
-            if(!shader_code)
-            {
-                fprintf(stderr, "ERROR: Allocation failed!\n");
-                exit(1);
-            }
-            *(shader_code + shader_in_len) = 0;
-
-            // Read the source code to our string (pointer)
-            fseek(shader_in, 0, SEEK_SET);
-            fread(shader_code, shader_in_len, sizeof(char), shader_in);
-            fclose(shader_in);
-        }
+        
         return shader_code;
     }
 
@@ -194,12 +229,7 @@ private:
 
         // Compilation variables to report error log
         GLint compile_err;
-        char* err_info_log = (char*)malloc(1024 * sizeof(char));
-        if (!err_info_log)
-        {
-            fprintf(stderr, "ERROR: Allocation failed!\n");
-            exit(1);
-        }
+        char* err_info_log = new char[1024];
 
         // Compile a shader program
         if (compile_option != PROGRAM)
@@ -207,7 +237,7 @@ private:
             glGetShaderiv(shader_program, GL_COMPILE_STATUS, &compile_err);
             if (!compile_err)
             { // Output error log
-                glGetShaderInfoLog(shader_program, sizeof(err_info_log), NULL, err_info_log);
+                glGetShaderInfoLog(shader_program, sizeof(err_info_log), nullptr, err_info_log);
                 fprintf(stderr, "ERROR: %s\n%s\n", enum_type_map[compile_option], err_info_log);
             }
         } // Else compile vertex or fragment or geometry shader
@@ -216,7 +246,7 @@ private:
             glGetProgramiv(shader_program, GL_LINK_STATUS, &compile_err);
             if (!compile_err)
             { // Output error log
-                glGetProgramInfoLog(shader_program, 1024, NULL, err_info_log);
+                glGetProgramInfoLog(shader_program, 1024, nullptr, err_info_log);
                 fprintf(stderr, "ERROR: %s\n%s\n", enum_type_map[compile_option], err_info_log);
             }
         }
@@ -227,6 +257,10 @@ private:
 
     /* Determines whether the shader has been installed */
     shaderInstallType install_flag;
+
+    /* Shader function type */
+    shaderFuncType func;
+
 };
 
 #endif
