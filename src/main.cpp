@@ -130,7 +130,7 @@ void initScene()
 
     // Load models
     grass.loadFromFiles("./models/grass/grass.obj", "./models/grass/grass.png");
-    tree1.loadFromFile("./models/tree1/tree1.3ds");
+    tree.loadFromFile("./models/tree/tree.3ds");
     snowhouse.loadFromFile("./models/snow_house/Snow covered CottageOBJ.obj");
     //stone.loadFromFile("./models/stone/STONE.3ds");
 
@@ -569,8 +569,8 @@ void renderScene(Shader shader)
             }
 
             for (int i = 0; i < num_tree; ++i) {
-                tree1.setModelMatrix(treeModelMatsA[i]);
-                tree1.draw(shader);
+                tree.setModelMatrix(treeModelMatsA[i]);
+                tree.draw(shader);
             }
         }
         if (drawTerrainA) {
@@ -594,8 +594,8 @@ void renderScene(Shader shader)
             }
 
             for (int i = 0; i < num_tree; ++i) {
-                tree1.setModelMatrix(treeModelMatsB[i]);
-                tree1.draw(shader);
+                tree.setModelMatrix(treeModelMatsB[i]);
+                tree.draw(shader);
             }
         }
         if (drawTerrainB) {

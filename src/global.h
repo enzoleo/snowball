@@ -1,99 +1,94 @@
-/*******************************************************************************
-** Software License Agreement (GNU GENERAL PUBLIC LICENSE)
-**
-** Copyright 2016-2017  Peiyu Liao (enzoliao95@gmail.com). All rights reserved.
-** Copyright 2016-2017  Yaohong Wu (wuyaohongdio@gmail.com). All rights reserved.
-**
-** LICENSE INFORMATION (GPL)
-** SEE `LICENSE` FILE.
-*******************************************************************************/
-
-#ifndef _GLOBAL_H_
-#define _GLOBAL_H_
-
+#pragma once
+#include <GL/glew.h>
 #include "objects.h"
-#include "model.h"
-#include "camera.h"
 #include "light.h"
+#include "terrain.h"
 
-/*****************************************************************
-** The foundamental texture declaration
-** @param texture_grass: The ground texture rendering grassland
-** @param texture_sky: The sky texture rendering bluesky
-** ---------------------------------------------------------------
-** You can change these textures by yourself.
-** Remember put your texture images into `textures` directory! 
-******************************************************************/
+/* forward declaration */
+class Camera;
+class Texture;
+class Model;
+class ParticleSystem;
+class ShadowMap;
+class Billboard;
 
-//class Model;  //forward declaration
-//class Camera;
-//class Shader;
-
+// Window
 GLFWwindow* window;
+const GLuint screen_width = 800, screen_height = 600;
 
+
+// Shaders
+Shader main_shader;
+Shader particle_shader;
+Shader depth_shader;
+Shader debug_depth_shader;
+Shader billboard_shader;
+Shader go_shader;
+Shader win_shader;
+
+// Camera
+Camera camera(
+	glm::vec3(0.0f, 5.0f, 20.0f),
+	glm::vec3(0.0f, 1.0f, 0.0f),
+	-90.0f, 0.0f
+);
+
+
+// Key, mouse callbacks related 
+bool keys[1024];
+GLfloat lastX = screen_width * 0.5, lastY = screen_height * 0.5;
+bool firstMouse = true;
+GLfloat deltaTime = 0.0f;
+GLfloat lastFrame = 0.0f;
+
+
+// For calculating ms/frame, fps
+int num_frames = 0;
+GLfloat lastTime = 0.0f;
+GLboolean bGameOver = false;
+GLboolean bWin = false;
+
+
+// Textures
 Texture texture_grass;
-Texture texture_sky;
 Texture texture_mud;
+Texture texture_sky;
+Texture texture_earth;
 Texture texture_snow;
+Texture texture_snowflake;
+Texture texture_red;
+Texture texture_white;
+Texture texture_desert;
+Texture texture_sbb;
+Texture texture_billboard;
+Texture texture_rock;
+Texture texture_wood;
+Texture texture_gameover;
+Texture texture_win;
+
+// Primitives, Models, etc.
+Cube cube(0.7, 0.1, 30);
+Square square(0.5, 0.1, 30);
+Square path(0.9, 0.0, 10);
+Ball ball(1.0, 40, 40, 0.0, 0.7, 50);
+Prism prism3;
+Model grass;
+Model wood;
+Model tree;
+Model house;
+Model snowhouse;
+Model stone;
+SnowBall snowball(1.0f, 20, 20, 1.0, 0.0, 10);
+Ball barrier_ball(1.0f, 20, 20, 1.0, 0.0, 10);
+Cube barrier_cube(1.0, 0.0, 10);
+
+// Light
+DirLight dirlight0;
+glm::vec3 lightPos;
+glm::vec3 lightDir;
 
 
-/* Construct a snow ball object */
-SnowBall snowball(0.6f, 20, 20);
-// Ball and model declaration
-Ball barrier_ball(1.0f, 20, 20);
-
-/* Default color using namespace */
-namespace Color
-{
-    // Basic color defined by RGBA value
-    const float white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    const float black[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    const float pureGold[] = { 0.85f, 0.96f, 0.15f, 1.0f };
-    const float rostyBrown[] = { 0.75f, 0.56f, 0.56f, 1.0f };
-    const float darkGray[] = { 0.20f, 0.20f, 0.20f, 1.0f };
-    const float blueViolet[] = { 0.54f, 0.17f, 0.89f, 1.0f };
-    const float steelBlue[] = { 0.27f, 0.51f, 0.71f, 1.0f };
-    const float fireBrick[] = { 0.70f, 0.13f, 0.13f, 1.0f };
-} // NAMESPACE END
-
-/* The global variables of parallel light */
-float lightColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-float lightDirection[] = { 1.0f, 1.0f, 1.0f, 0.0f };
-
-/* Spot light class definition */
-class Spotlight
-{
-public:
-    Spotlight() : angle(45.0f)
-    { // Constructor
-        color = new float[4];
-        position = new float[4];
-        direction = new float[3];
-        color[0] = 1.0f; color[1] = 1.0f; color[2] = 1.0f; color[3] = 1.0f;
-        position[0] = 0.0f; position[1] = 0.0f; position[2] = 2.0f; position[3] = 1.0f;
-        direction[0] = 0.0f; direction[1] = 0.0f; direction[2] = 1.0f;
-    }
-
-    ~Spotlight()
-    { // Destructor
-        delete[] color;
-        delete[] position;
-        delete[] direction;
-    }
-
-    // The color of spotlight
-    float* color;
-    // The position of spotlight
-    float* position;
-    // The direction of spotlight
-    float* direction;
-    // The light angle of spotlight
-    float angle;
-};
-
-// Add a spotlight to the scene
-Spotlight spotlight;
-// Add barriers to the scene
+// Game related
 Barriers barriers;
 
 int score = 0;
@@ -101,221 +96,80 @@ int score = 0;
 bool barriersUp = false;
 
 float deltaMove = 0;
+
 bool bTemp = true;
 
 bool update_deque_waiting_flag = false;
 bool update_deque_processing_flag = false;
 
 GLfloat speed = 0.001f;
+GLfloat currentX, currentY, currentZ;
 
-Model grass;
+// For moving the generator's position 
+GLfloat offset_z = 0;  
 
-//Camera camera(glm::vec3(0,0,5));
-Camera camera(
-    glm::vec3(0.0f, 5.0f, 20.0f),
-    glm::vec3(0.0f, 1.0f, 0.0f),
-    -90.0f, 0.0f
-);
-bool keys[1024];
-GLfloat lastX = 400, lastY = 300;
-bool firstMouse = true;
-GLfloat deltaTime = 0.0f;
-GLfloat lastFrame = 0.0f;
 
-Shader shader;
-GLuint screenWidth = 800, screenHeight = 600;
+// Terrains
+Terrain mini_terrain("./terrains/test.bmp");
 
-GLuint proj_loc;
-GLuint view_loc;
-GLuint model_loc;
-GLuint texture_loc;
 
-DirLight dirlight0;
+// Particle system
+ParticleSystem *ps;
 
-// Our vertices. Tree consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
-// A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
-static const GLfloat g_vertex_buffer_cube[] = {
-    -1.0f,-1.0f,-1.0f,
-    -1.0f,-1.0f, 1.0f,
-    -1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f,-1.0f,
-    -1.0f,-1.0f,-1.0f,
-    -1.0f, 1.0f,-1.0f,
-    1.0f,-1.0f, 1.0f,
-    -1.0f,-1.0f,-1.0f,
-    1.0f,-1.0f,-1.0f,
-    1.0f, 1.0f,-1.0f,
-    1.0f,-1.0f,-1.0f,
-    -1.0f,-1.0f,-1.0f,
-    -1.0f,-1.0f,-1.0f,
-    -1.0f, 1.0f, 1.0f,
-    -1.0f, 1.0f,-1.0f,
-    1.0f,-1.0f, 1.0f,
-    -1.0f,-1.0f, 1.0f,
-    -1.0f,-1.0f,-1.0f,
-    -1.0f, 1.0f, 1.0f,
-    -1.0f,-1.0f, 1.0f,
-    1.0f,-1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f,
-    1.0f,-1.0f,-1.0f,
-    1.0f, 1.0f,-1.0f,
-    1.0f,-1.0f,-1.0f,
-    1.0f, 1.0f, 1.0f,
-    1.0f,-1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f,-1.0f,
-    -1.0f, 1.0f,-1.0f,
-    1.0f, 1.0f, 1.0f,
-    -1.0f, 1.0f,-1.0f,
-    -1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f,
-    -1.0f, 1.0f, 1.0f,
-    1.0f,-1.0f, 1.0f
-};
 
-// Two UV coordinatesfor each vertex. They were created withe Blender.
-static const GLfloat g_uv_buffer_cube[] = {
-    0.000059f, 1.0f - 0.000004f,
-    0.000103f, 1.0f - 0.336048f,
-    0.335973f, 1.0f - 0.335903f,
-    1.000023f, 1.0f - 0.000013f,
-    0.667979f, 1.0f - 0.335851f,
-    0.999958f, 1.0f - 0.336064f,
-    0.667979f, 1.0f - 0.335851f,
-    0.336024f, 1.0f - 0.671877f,
-    0.667969f, 1.0f - 0.671889f,
-    1.000023f, 1.0f - 0.000013f,
-    0.668104f, 1.0f - 0.000013f,
-    0.667979f, 1.0f - 0.335851f,
-    0.000059f, 1.0f - 0.000004f,
-    0.335973f, 1.0f - 0.335903f,
-    0.336098f, 1.0f - 0.000071f,
-    0.667979f, 1.0f - 0.335851f,
-    0.335973f, 1.0f - 0.335903f,
-    0.336024f, 1.0f - 0.671877f,
-    1.000004f, 1.0f - 0.671847f,
-    0.999958f, 1.0f - 0.336064f,
-    0.667979f, 1.0f - 0.335851f,
-    0.668104f, 1.0f - 0.000013f,
-    0.335973f, 1.0f - 0.335903f,
-    0.667979f, 1.0f - 0.335851f,
-    0.335973f, 1.0f - 0.335903f,
-    0.668104f, 1.0f - 0.000013f,
-    0.336098f, 1.0f - 0.000071f,
-    0.000103f, 1.0f - 0.336048f,
-    0.000004f, 1.0f - 0.671870f,
-    0.336024f, 1.0f - 0.671877f,
-    0.000103f, 1.0f - 0.336048f,
-    0.336024f, 1.0f - 0.671877f,
-    0.335973f, 1.0f - 0.335903f,
-    0.667969f, 1.0f - 0.671889f,
-    1.000004f, 1.0f - 0.671847f,
-    0.667979f, 1.0f - 0.335851f
-};
+// Shadow Map
+ShadowMap *sm;
+const GLuint shadow_map_width = 1024, shadow_map_height = 1024;
 
-//this cube center at (0,0,0), the length of each edge is 2
-class Cube
-{
-public:
-    GLuint VAO;
-    GLuint VBO[2];
 
-    Cube()
-    {
-        glGenVertexArrays(1, &VAO);  //must initialise GLEW first!
-        glGenBuffers(2, &VBO[0]);
-        
-        glBindVertexArray(VAO);
-        
-        glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_cube), g_vertex_buffer_cube, GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_cube), g_uv_buffer_cube, GL_STATIC_DRAW);
-        
-        // Set the vertex attribute pointers
-        // Vertex Positions
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (GLvoid*)0);
-        
-        // Vertex UVs
-        glEnableVertexAttribArray(1);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), (GLvoid*)0);
-        
-        glBindVertexArray(0);   
-    }
+// Billboard
+Billboard* billboard;
+Billboard* gameover;
+Billboard* winning;
 
-    void Draw(Shader shader) {
-        shader.install();
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 12 * 3); // 12*3 indices starting at 0 -> 12 triangles
-        glBindVertexArray(0);
-        glUseProgram(0);
-    }
+// Screenshot
+int num_screenshots = 0;
 
-    void Draw() {
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 12 * 3); // 12*3 indices starting at 0 -> 12 triangles
-        glBindVertexArray(0);
-    }
 
-};
+// For texture changing, see main.frag 
+//GLfloat pastTime = 0.0f;
+GLfloat factor = 0.0f;
 
-static GLfloat path_buffer[] = {
-    // Positions                    // Texture Coords
-    300.0f, 0.0f, 10000.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // Top Right
-    300.0f, 0.0f, -10000.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
-    -300.0f, 0.0f, -10000.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, // Bottom Left
-    -300.0f, 0.0f, 10000.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left 
-};
 
-static GLuint g_indices[] = {  // Note that we start from 0!
-    0, 1, 3, // First Triangle
-    1, 2, 3  // Second Triangle
-};
+// For changing scenes and stages
+GLfloat dist_total = 0.0f;
+GLfloat dist_delta = 0.0f;  // dist_delta < 100
 
-class Square
-{
-public:
-    GLuint VAO, VBO, EBO;
-    GLfloat* buffer;
-    
-    Square(GLfloat *vert_buffer)
-    {
-        glGenVertexArrays(1, &VAO);
-        glGenBuffers(1, &VBO);
-        glGenBuffers(1, &EBO);
+// For transforming models like grass, trees, etc.
+GLuint num_grass = 20;
+std::vector<glm::mat4> grassModelMatsA;  //transformation matrices for part A
+std::vector<glm::mat4> grassModelMatsB;  //transformation matrices for part B
 
-        glBindVertexArray(VAO);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, 128, vert_buffer, GL_STATIC_DRAW);
+GLuint num_tree = 4;
+std::vector<glm::mat4> treeModelMatsA;
+std::vector<glm::mat4> treeModelMatsB;
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(g_indices), g_indices, GL_STATIC_DRAW);
+glm::mat4 pathModelMatA;
+glm::mat4 pathModelMatB;
 
-        // Position attribute
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
+Texture* pathTexA;
+Texture* pathTexB;
 
-        // Normal attribute
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+GLuint num_terrain = 2;
+std::vector<glm::mat4> terrainModelMatsA;
+std::vector<glm::mat4> terrainModelMatsB;
 
-        // TexCoord attribute
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
 
-        glBindVertexArray(0); // Unbind VAO
-    }
+bool updateA = true;
 
-    void draw(Shader shader) {
-        shader.install();
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
-        shader.uninstall();
-    }
-};
+bool drawPlantA = true;
+bool drawPlantB = true;
+bool drawTerrainA = false;
+bool drawTerrainB = false;
+bool drawSnow = false;
+bool drawSnowHouse = false;
 
-#endif
+bool startMovePS = false;
+
+GLuint stageA = 1;
+GLuint stageB = 1;

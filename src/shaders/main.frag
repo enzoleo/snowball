@@ -50,7 +50,7 @@ float CalcShadowDirLight(DirLight light, vec4 FragPosLightSpace, vec3 normal)
     float closestDepth = texture(shadowMap, projCoords.xy).r; 
     float currentDepth = projCoords.z;
 	vec3 lightDir = normalize(-light.direction);
-    float bias = max(0.005 * (1.0 - dot(normal, lightDir)), 0.0005);
+    float bias = max(0.01 * (1.0 - dot(normal, lightDir)), 0.0005);
 	//float bias = 0.005 * tan(acos(clamp(dot(normal, lightDir), 0, 1)));
 	//float bias = 0;
     // PCF, or percentage-closer filtering
@@ -93,4 +93,23 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
 	//shadow = 0.0;  //for debugging
     return ((1 - material.kd - material.ks) * ambient 
 	   + (1-shadow) * (material.kd * diffuse + material.ks * specular));
+	
+
+	//following code is for debugging
+	//return vec3(texture(material.diffuse1, TexCoord));	
+	//return (ambient + (1-shadow) * (diffuse + specular));
+	//return diffuse;    
+	//return specular;
+	//return ambient;
+	//return light.specular;
+	//return vec3(0.1) + vec3(0.4) + vec3(1);
+	//return specular + vec3(1000.0);
+	//return diffuse + specular + ambient;
+	//return vec3(material.kd);
+	//return vec3(material.ks);
+	//return vec3(material.shininess);
+	//return vec3(spec);
+	//return vec3(-1);
+	//return vec3(pow(0, 0));
+	//return vec3((dot(viewDir, reflectDir)));
 }
