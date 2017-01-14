@@ -96,13 +96,13 @@ void initScene()
     texture_sbb.reload("textures/snowball_barrier.jpg"); texture_sbb.setUnit(11);
 
     // Load Shaders
-    main_shader.reload("./shaders/main.vs", "./shaders/main.frag");
+    main_shader.reload("./shaders/main.vert", "./shaders/main.frag");
     main_shader.setFuncType(NORMAL);
-    depth_shader.reload("./shaders/shadow_mapping_depth.vs", "./shaders/shadow_mapping_depth.frag");
+    depth_shader.reload("./shaders/shadow_mapping_depth.vert", "./shaders/shadow_mapping_depth.frag");
     depth_shader.setFuncType(DEPTH);
-    particle_shader.reload("./shaders/particle_system.vs", "./shaders/particle_system.frag");
+    particle_shader.reload("./shaders/particle_system.vert", "./shaders/particle_system.frag");
     particle_shader.setFuncType(PARTICLE);
-    debug_depth_shader.reload("./shaders/debug_quad_depth.vs", "./shaders/debug_quad_depth.frag");
+    debug_depth_shader.reload("./shaders/debug_quad_depth.vert", "./shaders/debug_quad_depth.frag");
     debug_depth_shader.setFuncType(DEBUG);
     billboard_shader.reload("./shaders/billboard.vert", "./shaders/billboard.frag");
     billboard_shader.setFuncType(BILLBOARD);
