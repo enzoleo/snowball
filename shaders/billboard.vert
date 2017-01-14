@@ -29,5 +29,6 @@ void main()
     gl_Position = vec4(position, 1.0f);
 
     // The UV coordinates of vertices
-    UV = squareVertices.xy + vec2(0.5, 0.5);
+    UV.x = 0.5 + squareVertices.x;
+    UV.y = 0.5 - squareVertices.y;
 }
