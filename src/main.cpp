@@ -121,31 +121,23 @@ void initScene()
     mini_terrain.setup();
     square.setup();
     path.setup();
-    //cube.setup();
-    //ball.setup();
     snowball.setup();
     barrier_ball.setup();
     barrier_cube.setup();
-    //prism3.setup();
 
     // Load models
     grass.loadFromFiles("./models/grass/grass.obj", "./models/grass/grass.png");
     tree.loadFromFile("./models/tree/tree.3ds");
     snowhouse.loadFromFile("./models/snow_house/Snow covered CottageOBJ.obj");
-    //stone.loadFromFile("./models/stone/STONE.3ds");
 
-    // Initialize particle system
+    // Initialize particle system, shadow map and others
     ps = new ParticleSystem(particle_shader, texture_snowflake, glm::vec3(0, 30.0f, -2050), 1000, 50, 50);
-    // Initialize shadow map
-    sm = new ShadowMap(shadow_map_width, shadow_map_height);  //not need to be screen_width, screen_height
-    // Initialize billboard
+    sm = new ShadowMap(shadow_map_width, shadow_map_height);
     billboard = new Billboard(billboard_shader, texture_billboard);
     gameover = new Billboard(go_shader, texture_gameover);
     winning = new Billboard(win_shader, texture_win);
 
-
     // Bind shadow map
-
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, sm->getDepthMap());
     main_shader.install();
@@ -158,10 +150,8 @@ void initScene()
     main_shader.setUniform1i("snowMap", texture_white.getUnit());
     main_shader.uninstall();
 
-    
     // Initialize transformation matrices for objects
     glm::mat4 trans = glm::translate(glm::mat4(), glm::vec3(0, 0, -100));
-    // plants(grass, trees)
     {
         grassModelMatsA.reserve(num_grass);
         grassModelMatsB.reserve(num_grass);
@@ -237,7 +227,6 @@ void initScene()
     barrier_cube.setTexture(&texture_wood);
     mini_terrain.setTexture(&texture_mud);
     
-
     // Initialize barriers
     barriers.setNumBarTypes(2);
     barriers.setBarrierObj(0, barrier_ball);
@@ -288,7 +277,6 @@ void updateScene()
         drawSnowHouse = true;
     }
 
-
     // Get the current position of the snow ball
     currentX = snowball.getCurPosition().x;
     currentY = snowball.getCurPosition().y;
@@ -298,8 +286,6 @@ void updateScene()
     {
         bWin = true;
     }
-
-    //std::cout << "current z: " << currentZ << std::endl;
 
     // Update camera
     glm::vec3 cameraPos(currentX, 5.0f, currentZ + 16.0f);
@@ -333,15 +319,15 @@ void updateScene()
     particle_shader.uninstall();
 
     // Update particle system
-    if (drawSnow) {
-        if (startMovePS) {
-            ps->setGeneratorPos(glm::vec3(0, 30, currentZ));
-        }
-        
+    if (drawSnow)
+    {
+        if (startMovePS) 
+            ps->setGeneratorPos(glm::vec3(0, 30, currentZ));        
         ps->update(deltaTime);
 
         // For changing texture
-        if (factor < 0.9f) {
+        if (factor < 0.9f)
+        {
             factor += 0.05 * deltaTime;
             main_shader.install();
             main_shader.setUniform1f("factor", factor);
@@ -349,25 +335,23 @@ void updateScene()
         }
     }
     
-
     // Update our scene when dist_delta > 100
     if (dist_delta > 100) {
         glm::mat4 temp = glm::translate(glm::mat4(), glm::vec3(0, 0, -200));
         if (updateA)  // update Scene A
         {
             //std::cout << "update scene A " << std::endl;
-            if (drawPlantA) {
-                for (int i = 0; i < num_grass; ++i) {
+            if (drawPlantA)
+            {
+                for (int i = 0; i < num_grass; ++i)
                     grassModelMatsA[i] = temp * grassModelMatsA[i];
-                }
-                for (int i = 0; i < num_tree; ++i) {
+                for (int i = 0; i < num_tree; ++i)
                     treeModelMatsA[i] = temp * treeModelMatsA[i];
-                }
             }
-            if (drawTerrainA) {
-                for (int i = 0; i < num_terrain; ++i) {
+            if (drawTerrainA)
+            {
+                for (int i = 0; i < num_terrain; ++i)
                     terrainModelMatsA[i] = temp * terrainModelMatsA[i];
-                }
             }
             
             pathModelMatA = temp * pathModelMatA;
@@ -375,19 +359,17 @@ void updateScene()
         }
         else  //update Scene B 
         {
-            //std::cout << "update scene B " << std::endl;
-            if (drawPlantB) {
-                for (int i = 0; i < num_grass; ++i) {
+            if (drawPlantB)
+            {
+                for (int i = 0; i < num_grass; ++i)
                     grassModelMatsB[i] = temp * grassModelMatsB[i];
-                }
-                for (int i = 0; i < num_tree; ++i) {
+                for (int i = 0; i < num_tree; ++i)
                     treeModelMatsB[i] = temp * treeModelMatsB[i];
-                }
             }
-            if (drawTerrainB) {
-                for (int i = 0; i < num_terrain; ++i) {
+            if (drawTerrainB)
+            {
+                for (int i = 0; i < num_terrain; ++i)
                     terrainModelMatsB[i] = temp * terrainModelMatsB[i];
-                }
             }
             
             pathModelMatB = temp * pathModelMatB;
@@ -415,12 +397,9 @@ void updateScene()
         offset_z = speed * deltaTime;
         dist_total += offset_z;
         dist_delta += offset_z;
-
-        // For debugging
-        //std::cout << "total distance = " << dist_total << std::endl;
-        //std::cout << "delta distance = " << dist_delta << std::endl;
     }
-    else {
+    else
+    {
         offset_z = 0;
     }
 
@@ -436,8 +415,6 @@ void updateScene()
     GLfloat safePositionX;
     std::vector<GLfloat> foodPositionX; // size can be zero, one and two
     GLfloat left = 2, right = 2;  //no specific reason for choosing 2 
-    //if (currentZ < barrierPositionZ + 1.0f &&
-    //  currentZ > barrierPositionZ - 1.0f) 
     {
         if (score < deque.size() / 2) {
             safePositionX = 3.0f * deque[score];
@@ -540,6 +517,8 @@ void updateScene()
     float LifeLevel = snowball.getRadius();
     billboard_shader.install();
     billboard_shader.setUniform1f("LifeLevel", LifeLevel);
+    billboard_shader.setUniform1f("billboardLen", 0.6f);
+    billboard_shader.setUniform1f("billboardWidth", 0.075f);
     billboard_shader.uninstall();
 
     go_shader.install();
@@ -630,13 +609,11 @@ void renderScene(Shader shader)
     
 
     // Billboard
-    if (shader.getFuncType() != DEPTH) {
-        float billboardLen = 0.6f;
-        //float lifeLevel = sin(glfwGetTime())*0.5f + 0.5f;
+    if (shader.getFuncType() != DEPTH)
+    {
         float lifeLevel = snowball.getRadius();
         billboard_shader.install();
         billboard_shader.setUniform1f("lifeLevel", lifeLevel);
-        billboard_shader.setUniform1f("billboardLen", billboardLen);
         billboard_shader.uninstall();
         billboard->draw(camera, texture_billboard.getUnit());
 
