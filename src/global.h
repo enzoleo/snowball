@@ -110,7 +110,7 @@ GLfloat offset_z = 0;
 
 
 // Terrains
-Terrain mini_terrain("./terrains/test.bmp");
+Terrain mini_terrain("../terrains/test.bmp");
 
 
 // Particle system

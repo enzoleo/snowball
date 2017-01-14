@@ -30,7 +30,7 @@ void screenshot()
 {
     // Declare a string (the name of the screenshot)
     // ATTENTION: here the screenshots are always BMP files
-    std::string filename = "./screenshots/screenshot" + std::to_string(num_screenshots) + ".bmp";
+    std::string filename = "../screenshots/screenshot" + std::to_string(num_screenshots) + ".bmp";
 
     // Use SOIL library to export image file
     GLint save_result = SOIL_save_screenshot
@@ -83,32 +83,32 @@ void initScene()
     srand(time(0));  
 
     // Load textures
-    texture_grass.reload("textures/grass.jpg"); texture_grass.setUnit(1);
-    texture_rock.reload("textures/rock.jpg"); texture_rock.setUnit(2);
-    texture_mud.reload("textures/mud.jpg"); texture_mud.setUnit(3);
-    texture_snow.reload("textures/snow.jpg"); texture_snow.setUnit(4);
-    texture_snowflake.reload("textures/snowflake.png"); texture_snowflake.setUnit(5);
-    texture_white.reload("textures/white.jpg"); texture_white.setUnit(6);
-    texture_billboard.reload("textures/billboard.png"); texture_billboard.setUnit(7);
-    texture_wood.reload("textures/wood.jpg"); texture_wood.setUnit(8);
-    texture_gameover.reload("textures/gameover.jpg"); texture_gameover.setUnit(9);
-    texture_win.reload("textures/win.png"); texture_win.setUnit(10);
-    texture_sbb.reload("textures/snowball_barrier.jpg"); texture_sbb.setUnit(11);
+    texture_grass.reload("../textures/grass.jpg"); texture_grass.setUnit(1);
+    texture_rock.reload("../textures/rock.jpg"); texture_rock.setUnit(2);
+    texture_mud.reload("../textures/mud.jpg"); texture_mud.setUnit(3);
+    texture_snow.reload("../textures/snow.jpg"); texture_snow.setUnit(4);
+    texture_snowflake.reload("../textures/snowflake.png"); texture_snowflake.setUnit(5);
+    texture_white.reload("../textures/white.jpg"); texture_white.setUnit(6);
+    texture_billboard.reload("../textures/billboard.png"); texture_billboard.setUnit(7);
+    texture_wood.reload("../textures/wood.jpg"); texture_wood.setUnit(8);
+    texture_gameover.reload("../textures/gameover.jpg"); texture_gameover.setUnit(9);
+    texture_win.reload("../textures/win.png"); texture_win.setUnit(10);
+    texture_sbb.reload("../textures/snowball_barrier.jpg"); texture_sbb.setUnit(11);
 
     // Load Shaders
-    main_shader.reload("./shaders/main.vert", "./shaders/main.frag");
+    main_shader.reload("../shaders/main.vert", "../shaders/main.frag");
     main_shader.setFuncType(NORMAL);
-    depth_shader.reload("./shaders/shadow_mapping_depth.vert", "./shaders/shadow_mapping_depth.frag");
+    depth_shader.reload("../shaders/shadow_mapping_depth.vert", "../shaders/shadow_mapping_depth.frag");
     depth_shader.setFuncType(DEPTH);
-    particle_shader.reload("./shaders/particle_system.vert", "./shaders/particle_system.frag");
+    particle_shader.reload("../shaders/particle_system.vert", "../shaders/particle_system.frag");
     particle_shader.setFuncType(PARTICLE);
-    debug_depth_shader.reload("./shaders/debug_quad_depth.vert", "./shaders/debug_quad_depth.frag");
+    debug_depth_shader.reload("../shaders/debug_quad_depth.vert", "../shaders/debug_quad_depth.frag");
     debug_depth_shader.setFuncType(DEBUG);
-    billboard_shader.reload("./shaders/billboard.vert", "./shaders/billboard.frag");
+    billboard_shader.reload("../shaders/billboard.vert", "../shaders/billboard.frag");
     billboard_shader.setFuncType(BILLBOARD);
-    go_shader.reload("./shaders/start_over.vert", "./shaders/start_over.frag");
+    go_shader.reload("../shaders/start_over.vert", "../shaders/start_over.frag");
     go_shader.setFuncType(BILLBOARD);
-    win_shader.reload("./shaders/start_over.vert", "./shaders/start_over.frag");
+    win_shader.reload("../shaders/start_over.vert", "../shaders/start_over.frag");
     win_shader.setFuncType(BILLBOARD);
 
 
@@ -126,9 +126,9 @@ void initScene()
     barrier_cube.setup();
 
     // Load models
-    grass.loadFromFiles("./models/grass/grass.obj", "./models/grass/grass.png");
-    tree.loadFromFile("./models/tree/tree.3ds");
-    snowhouse.loadFromFile("./models/snow_house/Snow covered CottageOBJ.obj");
+    grass.loadFromFiles("../models/grass/grass.obj", "../models/grass/grass.png");
+    tree.loadFromFile("../models/tree/tree.3ds");
+    snowhouse.loadFromFile("../models/snow_house/Snow covered CottageOBJ.obj");
 
     // Initialize particle system, shadow map and others
     ps = new ParticleSystem(particle_shader, texture_snowflake, glm::vec3(0, 30.0f, -2050), 1000, 50, 50);
