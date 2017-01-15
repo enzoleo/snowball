@@ -90,7 +90,7 @@ void initScene()
     texture_snowflake.reload("../textures/snowflake.png"); texture_snowflake.setUnit(5);
     texture_white.reload("../textures/white.jpg"); texture_white.setUnit(6);
     texture_billboard.reload("../textures/billboard.png"); texture_billboard.setUnit(7);
-    texture_wood.reload("../textures/wood.jpg"); texture_wood.setUnit(8);
+    texture_wood.reload("../textures/rock.jpg"); texture_wood.setUnit(8);
     texture_gameover.reload("../textures/gameover.jpg"); texture_gameover.setUnit(9);
     texture_win.reload("../textures/win.png"); texture_win.setUnit(10);
     texture_sbb.reload("../textures/snowball_barrier.jpg"); texture_sbb.setUnit(11);
