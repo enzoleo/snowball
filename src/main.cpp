@@ -102,8 +102,6 @@ void initScene()
     depth_shader.setFuncType(DEPTH);
     particle_shader.reload("../shaders/particle_system.vert", "../shaders/particle_system.frag");
     particle_shader.setFuncType(PARTICLE);
-    debug_depth_shader.reload("../shaders/debug_quad_depth.vert", "../shaders/debug_quad_depth.frag");
-    debug_depth_shader.setFuncType(DEBUG);
     billboard_shader.reload("../shaders/billboard.vert", "../shaders/billboard.frag");
     billboard_shader.setFuncType(BILLBOARD);
     go_shader.reload("../shaders/start_over.vert", "../shaders/start_over.frag");
