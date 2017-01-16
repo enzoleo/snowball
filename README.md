@@ -1,6 +1,8 @@
 # SnowballRun
-#### Movement
-**Final project of Computer Graphics**. We are supposed to preview the basic concepts in graphics and do coding practice. Always welcome constructive criticism and suggestions!
+### *Movement*
+
+***Final project of Computer Graphics***. *We are supposed to preview the basic concepts in graphics and do coding practice. Always welcome constructive criticism and suggestions!*
+
 
 ## Brief introduction
 This is a simple game developed by **OpenGL3.3**. You control a snowball and drive it home, which means, you need to elude barriers to avoid dying and accumulate other snowballs to prolong your life. The snowball is always being melting! In other words, the radius of your snowball, which represents your life level, is always being decreasing. Merely elude barriers, or you will be dead immediately, and do not forget to accumulate snowballs at the same time. When seeing a house, you win the game.
@@ -24,4 +26,4 @@ This is a simple game developed by **OpenGL3.3**. You control a snowball and dri
 
 ## Download
 `Linux` and `Windows` platforms are tested. [Download](https://codeload.github.com/perryleo/FinalProject/zip/master) the source files and compile (make sure the **dependencies** mentioned above have been built).
-Downloadngoadng
+
