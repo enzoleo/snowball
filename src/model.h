@@ -1,4 +1,15 @@
-#pragma once
+/*******************************************************************************
+** Software License Agreement (GNU GENERAL PUBLIC LICENSE)
+**
+** Copyright 2016-2017  Peiyu Liao (enzoliao95@gmail.com). All rights reserved.
+** Copyright 2016-2017  Yaohong Wu (wuyaohongdio@gmail.com). All rights reserved.
+**
+** LICENSE INFORMATION (GPL)
+** SEE `LICENSE` FILE.
+*******************************************************************************/
+
+#ifndef _MODEL_H_
+#define _MODEL_H_
 
 #include <string>
 #include <fstream>
@@ -13,10 +24,11 @@
 #include <assimp/postprocess.h>
 
 #include "objects.h"
-#include "shader.h"
+#include "shader.hpp"
 #include "texture.h"
 
-struct Vertex {
+struct Vertex
+{
     // Position
     glm::vec3 Position;
     // Normal
@@ -379,7 +391,4 @@ private:
     }
 };
 
-
-
-
-
+#endif

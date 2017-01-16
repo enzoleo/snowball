@@ -78,6 +78,8 @@ public:
     const std::string getType() { return type; }
     const aiString getPath() { return path; }
     const GLuint getUnit() { return unit; }
+    const GLint getWidth() { return width; }
+    const GLint getHeight() { return height; }
 
     /* Set some privat members */
     void setID(const GLuint& _id) { id = _id; }

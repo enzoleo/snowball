@@ -13,10 +13,10 @@ struct Material
     float kd, ks, shininess;
 }; 
 
-/* DirLight: The variables about light settings
+/* Light: The variables about light settings
 **     Only parallel light is added.
 **     The variables used are @direction and other material settings */
-struct DirLight
+struct Light
 {
     vec3 direction;
     vec3 ambient;
@@ -42,14 +42,14 @@ out vec4 color;
 
 /****************
 ** UNIFORM
-** @param dirLight: The direction of parallel light
+** @param light: The direction of parallel light
 ** @param material: The material setting
 ** @param viewPos: The view vector
 ** @param shadowMap: The shadow map pf the current scene
 ** @param snowMap: The snow map (will be mixed after snow)
 ** @param factor: The mixed factor
 ****************/
-uniform DirLight dirLight;
+uniform Light light;
 uniform Material material; 
 uniform vec3 viewPos;
 uniform sampler2D shadowMap;
@@ -58,8 +58,8 @@ uniform float factor;
 
 /* Function prototypes
 ** Compute light direction and shadow light direction */
-vec3 ComputeDirLight(DirLight light, vec3 normal, vec3 viewDir);
-float ComputeShadowDirLight(DirLight light, vec4 FragPosLightSpace, vec3 normal);
+vec3 ComputeDirLight(Light light, vec3 normal, vec3 viewDir);
+float ComputeShadowDirLight(Light light, vec4 FragPosLightSpace, vec3 normal);
 
 /* GLOBAL variable (SHADOW) */
 float shadow = 0.0;
@@ -69,8 +69,8 @@ void main()
     // Compute shadow light direction
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
-    ComputeShadowDirLight(dirLight, FragPosLightSpace, norm);     
-    vec3 result = ComputeDirLight(dirLight, norm, viewDir);
+    ComputeShadowDirLight(light, FragPosLightSpace, norm);     
+    vec3 result = ComputeDirLight(light, norm, viewDir);
     
     // Output color
     color = vec4(result, 1.0);
@@ -83,7 +83,7 @@ void main()
 ** @param FragPosLightSpace: The light space of given fragment position
 ** @param normal: The normals of vertices
 **************/
-float ComputeShadowDirLight(DirLight light, vec4 FragPosLightSpace, vec3 normal)
+float ComputeShadowDirLight(Light light, vec4 FragPosLightSpace, vec3 normal)
 {
     vec3 projCoords = FragPosLightSpace.xyz / FragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
@@ -121,7 +121,7 @@ float ComputeShadowDirLight(DirLight light, vec4 FragPosLightSpace, vec3 normal)
 ** @param normal: The normals of vertices
 ** @param vieDir: The current view direction vector 
 **************/
-vec3 ComputeDirLight(DirLight light, vec3 normal, vec3 viewDir)
+vec3 ComputeDirLight(Light light, vec3 normal, vec3 viewDir)
 {
     vec3 lightDir = normalize(-light.direction);
     

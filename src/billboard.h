@@ -12,7 +12,7 @@
 #define _BILLBOARD_H_
 
 #include "GL/glew.h"
-#include "shader.h"
+#include "shader.hpp"
 #include "texture.h"
 #include "camera.h"
 
@@ -29,6 +29,13 @@ public:
     { // Do initialization
         init();
     }
+
+    /* Returns the private members
+    ** We set the billboard settings private, because they are not supposed to be editted easily
+    ** If they need to be editted, call the `set*` functions, which makes sure you edit them
+    ** on purpose, instead of unconsciously. */
+    const GLint getWidth() { return width; }
+    const GLint getHeight() { return height; }
 
     /* Function to draw this billboard */
     void draw(Camera camera, GLuint texture_unit)
@@ -54,6 +61,10 @@ private:
     ** Initiate all parameters in particle system */
     void init()
     {
+        // Get the width and height of texture
+        width = texture.getWidth();
+        height = texture.getHeight();
+
         GLfloat billboard_quad[] =
         {
             // The position and texture coordinates
@@ -91,6 +102,10 @@ private:
     /* PRIVATE MEMBER
     ** The texture we use to attach to each particle */
     Texture texture;
+
+    /* PRIVATE MEMBER
+    ** The width and height of billboard image */
+    GLint width, height;
 
     /* PRIVATE MEMBERS
     ** The VAO and VBOs of the particle system */

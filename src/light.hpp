@@ -8,22 +8,22 @@
 ** SEE `LICENSE` FILE.
 *******************************************************************************/
 
-#ifndef _LIGHT_H_
-#define _LIGHT_H_
+#ifndef _LIGHT_HPP_
+#define _LIGHT_HPP_
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "shader.h"
+#include "shader.hpp"
 
-class DirLight
+class Light
 {
 public:
 
     /* Default constructor & Constructor */
-    DirLight(const glm::vec3& _direction = glm::vec3(-1, -1, -1),
-             const glm::vec3& _ambient = glm::vec3(0.4, 0.4, 0.4),
-             const glm::vec3& _diffuse = glm::vec3(0.5, 0.5, 0.5),
-             const glm::vec3& _specular = glm::vec3(0.1, 0.1, 0.1))
+    Light(const glm::vec3& _direction = glm::vec3(-1, -1, -1),
+          const glm::vec3& _ambient = glm::vec3(0.4, 0.4, 0.4),
+          const glm::vec3& _diffuse = glm::vec3(0.5, 0.5, 0.5),
+          const glm::vec3& _specular = glm::vec3(0.1, 0.1, 0.1))
         : direction(glm::normalize(_direction)),
           ambient(_ambient), 
           diffuse(_diffuse), 
@@ -46,29 +46,35 @@ public:
     void setDiffuse(const glm::vec3& _diffuse) { diffuse = _diffuse; }
     void setSpecular(const glm::vec3& _specular) { specular = _specular; }
 
+    /* Function binds light shader */
     void bindShader(Shader shader)
     {
         shader.install();
-        glUniform3fv(glGetUniformLocation(shader.getProgram(), "dirLight.direction"), 1, glm::value_ptr(direction));
-        glUniform3fv(glGetUniformLocation(shader.getProgram(), "dirLight.ambient"), 1, glm::value_ptr(ambient));
-        glUniform3fv(glGetUniformLocation(shader.getProgram(), "dirLight.diffuse"), 1, glm::value_ptr(diffuse));
-        glUniform3fv(glGetUniformLocation(shader.getProgram(), "dirLight.specular"), 1, glm::value_ptr(specular));
+        shader.setUniform3fv("light.direction", direction);
+        shader.setUniform3fv("light.ambient", ambient);
+        shader.setUniform3fv("light.diffuse", diffuse);
+        shader.setUniform3fv("light.specular", specular);
         shader.uninstall();
     }
 
 private:
+
+    /* PRIVATE MEMBER 
+    ** The direction of light (no matter the kind of light) */
     glm::vec3 direction;
 
+    /* PRIVATE MEMBER 
+    ** The ambient vector of light */
     glm::vec3 ambient;
+
+    /* PRIVATE MEMBER 
+    ** The diffuse vector of light */
     glm::vec3 diffuse;
+
+    /* PRIVATE MEMBER 
+    ** The specular vector of light */
     glm::vec3 specular;
 };
 
-//target is related to the snowball's position
-//dir is the light's direction
-//length is the distance between the light position and target
-static void calcLightPos(const glm::vec3& target, const glm::vec3& dir, const GLfloat& length, glm::vec3& lightPos) {
-    lightPos = target + length * (-dir);
-}
-
 #endif
+

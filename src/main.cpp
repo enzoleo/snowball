@@ -8,7 +8,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <SOIL/SOIL.h>
 
-#include "shader.h"
+#include "shader.hpp"
 #include "camera.h"
 #include "texture.h"
 #include "model.h"
@@ -126,11 +126,10 @@ void initScene()
     win_shader.reload("../shaders/start_over.vert", "../shaders/start_over.frag");
     win_shader.setFuncType(BILLBOARD);
 
-
     // Set light
-    calcLightPos(snowball.getCurPosition() + glm::vec3(0.0f, 4.0f, 15.0f), dirlight0.getDirection(), 20, lightPos);
-    lightDir = dirlight0.getDirection();
-    dirlight0.bindShader(main_shader);
+    lightDir = light0.getDirection();
+    lightPos = snowball.getCurPosition() + glm::vec3(0.0f, 4.0f, 15.0f) - 20.0f * lightDir;
+    light0.bindShader(main_shader);
 
     // Setup objects
     mini_terrain.setup();
@@ -170,29 +169,30 @@ void initScene()
     {
         grassModelMatsA.reserve(num_grass);
         grassModelMatsB.reserve(num_grass);
-        for (GLint i = 0; i < num_grass / 2; ++i)
+        for (GLint i = 0; i < num_grass / 2; i++)
         {
             int temp = -10 * i;
             glm::mat4 model;
-            model = glm::translate(glm::mat4(), glm::vec3(-7, 0, temp));  //left
+            model = glm::translate(glm::mat4(), glm::vec3(-7, 0, temp));
             grassModelMatsA.push_back(model);
             grassModelMatsB.push_back(trans * model);
-            model = glm::translate(glm::mat4(), glm::vec3(7, 0, temp));  //right
+            model = glm::translate(glm::mat4(), glm::vec3(7, 0, temp));
             grassModelMatsA.push_back(model);
             grassModelMatsB.push_back(trans * model);
         }
 
         treeModelMatsA.reserve(num_tree);
         treeModelMatsB.reserve(num_tree);
-        for (GLint i = 0; i < num_tree / 2; ++i) {
+        for (GLint i = 0; i < num_tree / 2; i++)
+        {
             int temp = -50 * i;
             glm::mat4 model;
-            model = glm::translate(glm::mat4(), glm::vec3(-10, 0, temp));  //left
+            model = glm::translate(glm::mat4(), glm::vec3(-10, 0, temp));
             model = glm::rotate(model, (float)90.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
             model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
             treeModelMatsA.push_back(model);
             treeModelMatsB.push_back(trans * model);
-            model = glm::translate(glm::mat4(), glm::vec3(10, 0, temp));  //right
+            model = glm::translate(glm::mat4(), glm::vec3(10, 0, temp));
             model = glm::rotate(model, (float)90.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
             model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
             treeModelMatsA.push_back(model);
@@ -251,10 +251,6 @@ void initScene()
 /* update camera settings, light settings, objects settings, etc. */
 void updateScene()
 {
-    // Update stage
-    // stage 1: grass land
-    // stage 2: desert
-    // stage 3: iceworld
     if (dist_total > 900 && stageA == 1) //change scene A
     {
         stageA++;
@@ -308,16 +304,19 @@ void updateScene()
     glm::mat4 projection = glm::perspective(camera.getFovy(), (float)window_width / (float)window_height, 0.1f, 300.0f);
     glm::mat4 view = camera.getViewMat();
 
-    // Update light
+    // Update light settings
     if (lightDir.x > 1) lightDir.x -= 0.05 * deltaTime;
     if (lightDir.x < -1) lightDir.x += 0.05 * deltaTime;
-    dirlight0.setDirection(lightDir);
-    dirlight0.bindShader(main_shader);
-    glm::vec3 target = snowball.getCurPosition() + glm::vec3(0.0f, 4.0f, 15.0f);
-    calcLightPos(target, dirlight0.getDirection(), 20, lightPos);
+    light0.setDirection(lightDir);
+    light0.bindShader(main_shader);
+
+    // Re-compute the light position vector
+    lightPos = snowball.getCurPosition() + glm::vec3(0.0f, 4.0f, 15.0f) - 20.0f * light0.getDirection();
     glm::mat4 lightProjection, lightView, lightSpaceMatrix;
     lightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, 1.0f, 100.0f);
-    lightView = glm::lookAt(lightPos, target, glm::vec3(0.0, 1.0, 0.0));
+    lightView = glm::lookAt(lightPos,
+                            snowball.getCurPosition() + glm::vec3(0.0f, 4.0f, 15.0f),
+                            glm::vec3(0.0, 1.0, 0.0));
     lightSpaceMatrix = lightProjection * lightView;
 
     // Set uniforms for our shaders
@@ -340,9 +339,8 @@ void updateScene()
             ps->setGeneratorPos(glm::vec3(0, 30, currentZ));        
         ps->update(deltaTime);
 
-        // For changing texture
         if (factor < 0.9f)
-        {
+        { // For changing texture
             factor += 0.05 * deltaTime;
             main_shader.install();
             main_shader.setUniform1f("factor", factor);
@@ -351,7 +349,8 @@ void updateScene()
     }
     
     // Update our scene when dist_delta > 100
-    if (dist_delta > 100) {
+    if (dist_delta > 100)
+    {
         glm::mat4 temp = glm::translate(glm::mat4(), glm::vec3(0, 0, -200));
         if (updateA)  // update Scene A
         {
@@ -424,9 +423,11 @@ void updateScene()
     GLfloat spacing = barriers.getSpacing();
     GLfloat barrierPositionZ = -(score + 1) * spacing;
 
-    /* The x-coordinate of safe position in each barrier row
-    ** We have to update deque data if the score exceeds half the size of
-    ** the original deque size (The size is fixed!) */
+    // ------------------------------------------------------------------------------
+    // The x-coordinate of safe position in each barrier row
+    // We have to update deque data if the score exceeds half the size of
+    // the original deque size (The size is fixed!)
+    // ------------------------------------------------------------------------------
     GLfloat safePositionX;
     std::vector<GLfloat> foodPositionX; // size can be zero, one and two
     GLfloat left = 2, right = 2;  //no specific reason for choosing 2 
@@ -537,13 +538,13 @@ void updateScene()
     billboard_shader.uninstall();
 
     go_shader.install();
-    go_shader.setUniform1f("billboardLen", 0.65f);
-    go_shader.setUniform1f("billboardWidth", 0.472f);
+    go_shader.setUniform1f("billboardLen", 0.001f * gameover->getWidth());
+    go_shader.setUniform1f("billboardWidth", 0.001f * gameover->getHeight());
     go_shader.uninstall();
 
     win_shader.install();
-    win_shader.setUniform1f("billboardLen", 0.6f);
-    win_shader.setUniform1f("billboardWidth", 0.6f);
+    win_shader.setUniform1f("billboardLen", 0.001f * winning->getWidth());
+    win_shader.setUniform1f("billboardWidth", 0.001f * winning->getHeight());
     win_shader.uninstall();
 }
 

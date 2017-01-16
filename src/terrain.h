@@ -44,7 +44,7 @@ public:
     /* Default constructor & constructor */
     Terrain(const char* heightMapPixels,
         GLfloat _size = 100.0f,
-        GLfloat _peak = 160.0f)
+        GLfloat _peak = 40.0f)
         : size(_size),
         peak(_peak)
     {
@@ -441,11 +441,11 @@ private:
         // The lines above determine whether the vertex is a vertex or on border
         // Compute the approximate normal vector of the chosen vertex
         glm::vec3 normal_vec = glm::cross(right_vec, top_vec)
-            + glm::cross(top_vec, toplt_vec)
-            + glm::cross(toplt_vec, left_vec)
-            + glm::cross(left_vec, btm_vec)
-            + glm::cross(btm_vec, btmrt_vec)
-            + glm::cross(btmrt_vec, right_vec);
+                             + glm::cross(top_vec, toplt_vec)
+                             + glm::cross(toplt_vec, left_vec)
+                             + glm::cross(left_vec, btm_vec)
+                             + glm::cross(btm_vec, btmrt_vec)
+                             + glm::cross(btmrt_vec, right_vec);
 
         return glm::normalize(normal_vec);
     }
@@ -474,9 +474,9 @@ private:
 
         // Save the normal map data (BMP file)
         GLint save_result = SOIL_save_image(filename.c_str(),
-            SOIL_SAVE_TYPE_BMP,
-            cells, cells, 3,
-            normal_map);
+                                            SOIL_SAVE_TYPE_BMP,
+                                            cells, cells, 3,
+                                            normal_map);
 
         // Delete normal map temporary pointer
         delete[] normal_map;

@@ -18,7 +18,7 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include "texture.h"
-#include "shader.h"
+#include "shader.hpp"
 
 /* CLASS: Object (base class) */
 class Object

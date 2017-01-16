@@ -1,7 +1,7 @@
 #pragma once
 #include <GL/glew.h>
 #include "objects.h"
-#include "light.h"
+#include "light.hpp"
 #include "terrain.h"
 
 /* forward declaration */
@@ -81,7 +81,7 @@ Ball barrier_ball(1.0f, 20, 20, 1.0, 0.0, 10);
 Cube barrier_cube(1.0, 0.0, 10);
 
 // Light
-DirLight dirlight0;
+Light light0;
 glm::vec3 lightPos;
 glm::vec3 lightDir;
 
