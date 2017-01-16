@@ -46,9 +46,3 @@
 *.rar
 *.tar.gz
 *.7z
-
-# Image File
-*.png
-*.jpg
-*.jpeg
-*.eps
