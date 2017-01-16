@@ -14,8 +14,7 @@ class Billboard;
 
 // Window
 GLFWwindow* window;
-const GLuint screen_width = 800, screen_height = 600;
-
+GLuint window_width, window_height;
 
 // Shaders
 Shader main_shader;
@@ -36,7 +35,7 @@ Camera camera(
 
 // Key, mouse callbacks related 
 bool keys[1024];
-GLfloat lastX = screen_width * 0.5, lastY = screen_height * 0.5;
+GLfloat lastX = window_width * 0.5, lastY = window_height * 0.5;
 bool firstMouse = true;
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
@@ -71,7 +70,6 @@ Cube cube(0.7, 0.1, 30);
 Square square(0.5, 0.1, 30);
 Square path(0.9, 0.0, 10);
 Ball ball(1.0, 40, 40, 0.0, 0.7, 50);
-Prism prism3;
 Model grass;
 Model wood;
 Model tree;

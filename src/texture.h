@@ -1,3 +1,13 @@
+/*******************************************************************************
+** Software License Agreement (GNU GENERAL PUBLIC LICENSE)
+**
+** Copyright 2016-2017  Peiyu Liao (enzoliao95@gmail.com). All rights reserved.
+** Copyright 2016-2017  Yaohong Wu (wuyaohongdio@gmail.com). All rights reserved.
+**
+** LICENSE INFORMATION (GPL)
+** SEE `LICENSE` FILE.
+*******************************************************************************/
+
 #ifndef _TEXTURE_H_
 #define _TEXTURE_H_
 
@@ -25,7 +35,6 @@ public:
     /* Reload image and rebind this texture */
     void reload(const char* image_path)
     {
-        GLint width, height;
         unsigned char* image = SOIL_load_image(image_path, &width, &height, 0, SOIL_LOAD_RGBA);
         // Make room for our texture
         glGenTextures(1, &id);
@@ -78,28 +87,38 @@ public:
 
 private:
 
-    /* The ID of this texture
+    /* PRIVATE MEMBER:
+    ** The ID of this texture
     ** The most IMPORTANT member! */
     GLuint id;
 
-    /* Specifies the level-of-detail number.
+    /* PRIVATE MEMBER:
+    ** Specifies the level-of-detail number.
     ** Level 0 is the base image level.
     ** Level n is the nth mipmap reduction image.
     ** DEFAULT: 0 */
     GLint level;
 
-    /* The border width of texture
+    /* PRIVATE MEMBER:
+    ** The border width of texture
     ** DEFAULT: 0 */
     GLint border;
 
-    /* The type of texture: diffuse, specular, etc.
+    /* PRIVATE MEMBER:
+    ** The width and height of the texture */
+    GLint width, height;
+
+    /* PRIVATE MEMBER:
+    ** The type of texture: diffuse, specular, etc.
     ** DEFAULT: diffuse */
     std::string type;
 
-    /* The path of the texture file */
+    /* PRIVATE MEMBER:
+    ** The path of the texture file */
     aiString path;
 
-    /* The texture unit this texture binds */
+    /* PRIVATE MEMBER:
+    ** The texture unit this texture binds */
     GLuint unit;
 
 };

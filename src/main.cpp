@@ -19,6 +19,8 @@
 #include "shadow_map.h"
 #include "billboard.h"
 
+#define FULL_SCREEN_MODE
+
 /* Function prototypes for moving the camera and changing viewing direction */
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -38,8 +40,8 @@ void screenshot()
         filename.c_str(),
         SOIL_SAVE_TYPE_BMP,
         0, 0,
-        screen_width,
-        screen_height
+        window_width,
+        window_height
     );
     num_screenshots++;
 }
@@ -55,9 +57,24 @@ void initGL()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    glfwWindowHint(GLFW_DECORATED, GL_FALSE); 
 
+    // ------------------------------------------------------------------------------
+    // Get the screem width and height to open fullscreen mode
     // Create a new GLFW window (name it `Snowball Game`)
-    window = glfwCreateWindow(screen_width, screen_height, "Snowball Game", nullptr, nullptr);
+    // If you do not like fullscreen mode, undef the macro FULL_SCREEN_MODE
+    // ------------------------------------------------------------------------------
+#ifdef FULL_SCREEN_MODE
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+    window_width = mode->width;
+    window_height = mode->height;
+    window = glfwCreateWindow(window_width, window_height, "SnowballRun", glfwGetPrimaryMonitor(), nullptr);
+#else
+    window_width = 800;
+    window_height = 600;
+    window = glfwCreateWindow(window_width, window_height, "SnowballRun", nullptr, nullptr);
+#endif
     glfwMakeContextCurrent(window);
 
     // Initialize GLEW to setup the OpenGL Function pointers
@@ -67,12 +84,12 @@ void initGL()
 
     // Ensure we can capture the escape key being pressed below
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-    // Hide our mouse in the window
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
-    glViewport(0, 0, screen_width, screen_height);
+    glViewport(0, 0, window_width, window_height);
+    
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 }
@@ -91,7 +108,7 @@ void initScene()
     texture_white.reload("../textures/white.jpg"); texture_white.setUnit(6);
     texture_billboard.reload("../textures/billboard.png"); texture_billboard.setUnit(7);
     texture_wood.reload("../textures/container.jpg"); texture_wood.setUnit(8);
-    texture_gameover.reload("../textures/gameover.jpg"); texture_gameover.setUnit(9);
+    texture_gameover.reload("../textures/gameover.png"); texture_gameover.setUnit(9);
     texture_win.reload("../textures/win.png"); texture_win.setUnit(10);
     texture_sbb.reload("../textures/snowball_barrier.jpg"); texture_sbb.setUnit(11);
 
@@ -288,7 +305,7 @@ void updateScene()
     // Update camera
     glm::vec3 cameraPos(currentX, 5.0f, currentZ + 16.0f);
     camera.setPosition(cameraPos);
-    glm::mat4 projection = glm::perspective(camera.getFovy(), (float)screen_width / (float)screen_height, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(camera.getFovy(), (float)window_width / (float)window_height, 0.1f, 300.0f);
     glm::mat4 view = camera.getViewMat();
 
     // Update light
@@ -520,8 +537,8 @@ void updateScene()
     billboard_shader.uninstall();
 
     go_shader.install();
-    go_shader.setUniform1f("billboardLen", 0.6f);
-    go_shader.setUniform1f("billboardWidth", 0.3375f);
+    go_shader.setUniform1f("billboardLen", 0.65f);
+    go_shader.setUniform1f("billboardWidth", 0.472f);
     go_shader.uninstall();
 
     win_shader.install();
@@ -648,7 +665,7 @@ int main()
         renderScene(depth_shader);
         sm->Unbind();
 
-        glViewport(0, 0, screen_width, screen_height);
+        glViewport(0, 0, window_width, window_height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.2f, 0.3f, 0.3f, 0.0f);
         renderScene(main_shader);
