@@ -26,7 +26,7 @@ public:
     void reload(const char* image_path)
     {
         GLint width, height;
-        unsigned char* image = SOIL_load_image(image_path, &width, &height, 0, SOIL_LOAD_RGB);
+        unsigned char* image = SOIL_load_image(image_path, &width, &height, 0, SOIL_LOAD_RGBA);
         // Make room for our texture
         glGenTextures(1, &id);
         // Tell OpenGL which texture to edit and map the image to the texture
@@ -37,9 +37,9 @@ public:
         // Learn more about this function:
         // https://www.khronos.org/opengles/sdk/docs/man/xhtml/glTexImage2D.xml
         // ----------------------------------------------------------------------------------------
-        glTexImage2D(GL_TEXTURE_2D, level, GL_RGB,
+        glTexImage2D(GL_TEXTURE_2D, level, GL_RGBA,
                      width, height, border,
-                     GL_RGB, GL_UNSIGNED_BYTE, image);
+                     GL_RGBA, GL_UNSIGNED_BYTE, image);
 
         glGenerateMipmap(GL_TEXTURE_2D);
         SOIL_free_image_data(image);

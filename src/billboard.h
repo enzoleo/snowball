@@ -39,12 +39,10 @@ public:
 
         // Enable blend
         glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         texture.bind(texture_unit);
         shader.setUniform1i("texture_sampler", texture_unit);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glDisable(GL_BLEND);
         glBindVertexArray(0);
         shader.uninstall();
