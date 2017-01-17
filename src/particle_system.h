@@ -31,9 +31,9 @@ struct ParticleBase
 {
     /* Default constructor & Constructor */
     ParticleBase(GLfloat _drag_coef = 1000.0f,
-        GLfloat _size = 0.5f)
+                 GLfloat _size = 0.2f)
         : drag_coef(_drag_coef),
-        size(_size)
+          size(_size)
     { // Do nothing here
     }
 
@@ -52,15 +52,15 @@ class Particle : public ParticleBase
 public:
     /* Default constructor & Constructor */
     Particle(GLfloat _drag_coef = 1000.0f,
-        GLfloat _size = 0.5f,
-        const glm::vec3& _position = glm::vec3(0.0f, 0.0f, 0.0f),
-        const glm::vec3& _velocity = glm::vec3(0.0f, 0.0f, 0.0f))
+             GLfloat _size = 0.2f,
+             const glm::vec3& _position = glm::vec3(0.0f, 0.0f, 0.0f),
+             const glm::vec3& _velocity = glm::vec3(0.0f, 0.0f, 0.0f))
         : ParticleBase(_drag_coef, _size),
-        position(_position),
-        velocity(_velocity),
-        gravity(glm::vec3(0.0f, -9.80665f, 0.0f)),
-        drag(glm::vec3(0.0f, 0.0f, 0.0f)),
-        life(-1.0f)
+          position(_position),
+          velocity(_velocity),
+          gravity(glm::vec3(0.0f, -9.80665f, 0.0f)),
+          drag(glm::vec3(0.0f, 0.0f, 0.0f)),
+          life(-1.0f)
     { // Do nothing here
     }
 
@@ -112,20 +112,20 @@ public:
 
     /* Default constructor & Constructor */
     ParticleSystem(const Shader& _shader,
-        const Texture& _texture,
-        const glm::vec3& _position_generator,
-        GLuint _generate_speed,
-        GLfloat _range_x,
-        GLfloat _range_z,
-        GLfloat _drag_coef = 200.0f,
-        GLfloat _size = 0.5f)
+                   const Texture& _texture,
+                   const glm::vec3& _position_generator,
+                   GLuint _generate_speed,
+                   GLfloat _range_x,
+                   GLfloat _range_z,
+                   GLfloat _drag_coef = 200.0f,
+                   GLfloat _size = 0.2f)
         : shader(_shader),
-        texture(_texture),
-        generate_speed(_generate_speed),
-        position_generator(_position_generator),
-        range_x(_range_x),
-        range_z(_range_z),
-        ParticleBase(_drag_coef, _size)
+          texture(_texture),
+          generate_speed(_generate_speed),
+          position_generator(_position_generator),
+          range_x(_range_x),
+          range_z(_range_z),
+          ParticleBase(_drag_coef, _size)
     { // Do initialization
         init();
     }

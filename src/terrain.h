@@ -32,9 +32,9 @@
 ** @param (x, y, z) must lay on the triangle
 ** Then we use the value of x, z to return altitude y. */
 static GLfloat genAltitudeCoord(const glm::vec3& vertex1,
-    const glm::vec3& vertex2,
-    const glm::vec3& vertex3,
-    const GLfloat& x, const GLfloat& z);
+                                const glm::vec3& vertex2,
+                                const glm::vec3& vertex3,
+                                const GLfloat& x, const GLfloat& z);
 
 /* CLASS: terrain */
 class Terrain : public Object
@@ -43,10 +43,10 @@ public:
 
     /* Default constructor & constructor */
     Terrain(const char* heightMapPixels,
-        GLfloat _size = 100.0f,
-        GLfloat _peak = 40.0f)
+            GLfloat _size = 100.0f,
+            GLfloat _peak = 40.0f)
         : size(_size),
-        peak(_peak)
+          peak(_peak)
     {
         //model = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
         generate(heightMapPixels);
@@ -182,10 +182,10 @@ private:
         // Use SOIL library to load image from file
         // See SOIL documentation to learn more about the function `SOIL_load_image`
         unsigned char* height_map = SOIL_load_image(heightMapPixels,
-            &width,
-            &height,
-            &channels,
-            SOIL_LOAD_L);
+                                                    &width,
+                                                    &height,
+                                                    &channels,
+                                                    SOIL_LOAD_L);
         // SOIL failed to load height map from the given filaname
         if (!height_map) fprintf(stderr, "ERROR: Fail to load image: %s\n", heightMapPixels);
         else
@@ -234,7 +234,7 @@ private:
         smoothingNormals();
 #endif
 #ifdef _TERRAIN_NORMAL_SAVE_
-        saveNormalMap("../terrains/normal_map.bmp");
+        saveNormalMap("../assets/terrains/normal_map.bmp");
         printf("Normal Map Saved Successfully!\n");
 #endif
     }
@@ -526,9 +526,9 @@ private:
 ** Used in function `GLfloat getAltitude(const GLfloat&, const GLfloat&)`
 ** to get the altitude of terrain using given coordinates. */
 static GLfloat genAltitudeCoord(const glm::vec3& vertex1,
-    const glm::vec3& vertex2,
-    const glm::vec3& vertex3,
-    const GLfloat& x, const GLfloat& z)
+                                const glm::vec3& vertex2,
+                                const glm::vec3& vertex3,
+                                const GLfloat& x, const GLfloat& z)
 {
     // Computes edge vectors and cross them
     glm::vec3 vec1_to_2 = vertex2 - vertex1;

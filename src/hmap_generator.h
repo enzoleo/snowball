@@ -46,9 +46,9 @@ struct HeightMapParams : public MapParams
 
     /* Default constructor & Constructor */
     HeightMapParams(GeneratorAlgorithm _algorithm = NONE_ALGORITHM,
-        const std::string& _heightMapPath = "../terrains/",
-        GLuint _width = 256,
-        GLuint _height = 256)
+                    const std::string& _heightMapPath = "../assets/terrains/",
+                    GLuint _width = 256,
+                    GLuint _height = 256)
     {
         // Malloc space and assignment
         std::string* _path_ptr = new std::string;
@@ -102,13 +102,13 @@ class HeightMapGeneratorBase
 public:
 
     /* Default constructor & Constructor */
-    HeightMapGeneratorBase(const std::string& _heightMapPath = "../terrains/",
-        GLuint _width = 256,
-        GLuint _height = 256)
+    HeightMapGeneratorBase(const std::string& _heightMapPath = "../assets/terrains/",
+                           GLuint _width = 256,
+                           GLuint _height = 256)
         : heightMapPath(_heightMapPath),
-        width(_width),
-        height(_height),
-        algorithm(NONE_ALGORITHM)
+          width(_width),
+          height(_height),
+          algorithm(NONE_ALGORITHM)
     { // Do nothing here
     }
 
@@ -116,7 +116,7 @@ public:
     HeightMapGeneratorBase(const HeightMapParams& params)
     { // Find value with given key
         HeightMapParams params_copy = params;
-        heightMapPath = params_copy.get_param<std::string>("heightMapPath", "../terrains/");
+        heightMapPath = params_copy.get_param<std::string>("heightMapPath", "../assets/terrains/");
         width = params_copy.get_param<GLuint>("width", 256);
         height = params_copy.get_param<GLuint>("height", 256);
         algorithm = params_copy.get_param<GeneratorAlgorithm>("algorithm", NONE_ALGORITHM);
@@ -140,10 +140,10 @@ public:
 protected:
 
     /* FUNCTION: save height map
-    ** DEFAULT directory: "../terrains/"
+    ** DEFAULT directory: "../assets/terrains/"
     ** The height map will be saved into this directory */
     GLint save(ImagePointer heightMapData,
-        const std::string& filename)
+               const std::string& filename)
     {
         // Get the absolute path of the height map file
         std::string ap_filename = heightMapPath + filename;
@@ -177,11 +177,11 @@ protected:
         // Use SOIL library to save height map
         // See SOIL documentation to learn more about the function `SOIL_save_image`
         GLint save_success = SOIL_save_image(ap_filename.c_str(),
-            SOIL_SAVE_TYPE_BMP,
-            width,
-            height,
-            1,
-            heightMapPixels);
+                                             SOIL_SAVE_TYPE_BMP,
+                                             width,
+                                             height,
+                                             1,
+                                             heightMapPixels);
         // Delete the height_map
         delete[] heightMapPixels;
         return save_success;
@@ -189,7 +189,7 @@ protected:
 
     /* PROTECTED MEMBER
     ** The directory of height map.
-    ** Default: "../terrains/" */
+    ** Default: "../assets/terrains/" */
     std::string heightMapPath;
 
     /* PRIVATE MEMBER
@@ -206,9 +206,9 @@ struct CircleStrikeParams : public HeightMapParams
 {
     /* Default constructor & Constructor */
     CircleStrikeParams(GLfloat _circleRadius = 50.0f,
-        GLfloat _forwardFlx = 1.0f,
-        GLfloat _backwardFlx = -1.0f,
-        const std::string& _heightMapPath = "../terrains/")
+                       GLfloat _forwardFlx = 1.0f,
+                       GLfloat _backwardFlx = -1.0f,
+                       const std::string& _heightMapPath = "../assets/terrains/")
         : HeightMapParams(CIRCLE_STRIKE_ALGORITHM, _heightMapPath)
     {
         // New several pointers
@@ -236,36 +236,36 @@ public:
 
     /* Default constructor & Constructor */
     CircleStrikeGenerator(GLfloat _circleRadius = 50.0f,
-        GLfloat _forwardFlx = 1.0f,
-        GLfloat _backwardFlx = -1.0f,
-        GLuint _iterations = 100,
-        GLuint _stableIterNum = 100,
-        GLfloat _maxCrash = 1.0f,
-        GLfloat _minCrash = 0.1f,
-        const std::string& _heightMapPath = "../terrains/")
+                          GLfloat _forwardFlx = 1.0f,
+                          GLfloat _backwardFlx = -1.0f,
+                          GLuint _iterations = 100,
+                          GLuint _stableIterNum = 100,
+                          GLfloat _maxCrash = 1.0f,
+                          GLfloat _minCrash = 0.1f,
+                          const std::string& _heightMapPath = "../assets/terrains/")
         : HeightMapGeneratorBase(_heightMapPath),
-        circleRadius(_circleRadius),
-        forwardFlx(_forwardFlx),
-        backwardFlx(_backwardFlx),
-        iterations(_iterations),
-        stableIterNum(_stableIterNum),
-        maxCrash(_maxCrash),
-        minCrash(_minCrash)
+          circleRadius(_circleRadius),
+          forwardFlx(_forwardFlx),
+          backwardFlx(_backwardFlx),
+          iterations(_iterations),
+          stableIterNum(_stableIterNum),
+          maxCrash(_maxCrash),
+          minCrash(_minCrash)
     { // Do nothing here
         algorithm = CIRCLE_STRIKE_ALGORITHM;
     }
 
     /* Constructor with specific parameters */
     CircleStrikeGenerator(const CircleStrikeParams& params,
-        GLuint _iterations = 100,
-        GLuint _stableIterNum = 100,
-        GLfloat _maxCrash = 1.0f,
-        GLfloat _minCrash = 0.1f)
+                          GLuint _iterations = 100,
+                          GLuint _stableIterNum = 100,
+                          GLfloat _maxCrash = 1.0f,
+                          GLfloat _minCrash = 0.1f)
         : HeightMapGeneratorBase(params),
-        iterations(_iterations),
-        stableIterNum(_stableIterNum),
-        maxCrash(_maxCrash),
-        minCrash(_minCrash)
+          iterations(_iterations),
+          stableIterNum(_stableIterNum),
+          maxCrash(_maxCrash),
+          minCrash(_minCrash)
     { // Find value with given key
         CircleStrikeParams params_copy = params;
         circleRadius = params_copy.get_param<GLfloat>("circleRadius", 50.0f);
@@ -431,8 +431,8 @@ struct PerlinNoiseParams : public HeightMapParams
 {
     /* Default constructor & Constructor */
     PerlinNoiseParams(GLfloat _smooth = 2.0f,
-        GLuint _persistence = 2,
-        const std::string& _heightMapPath = "../terrains/")
+                      GLuint _persistence = 2,
+                      const std::string& _heightMapPath = "../assets/terrains/")
         : HeightMapParams(PERLIN_NOISE_ALGORITHM, _heightMapPath)
     {
         // New several pointers and do assignments
@@ -455,22 +455,22 @@ public:
 
     /* Default constructor & Constructor */
     PerlinNoiseGenerator(GLfloat _smooth = 2.0f,
-        GLuint _persistence = 2,
-        GLuint octaves = 8,
-        const std::string& _heightMapPath = "../terrains/")
+                         GLuint _persistence = 2,
+                         GLuint octaves = 8,
+                         const std::string& _heightMapPath = "../assets/terrains/")
         : HeightMapGeneratorBase(_heightMapPath),
-        smooth(_smooth),
-        persistence(_persistence),
-        octaves(8)
+          smooth(_smooth),
+          persistence(_persistence),
+          octaves(8)
     { // Do nothing here
         algorithm = PERLIN_NOISE_ALGORITHM;
     }
 
     /* Constructor with specific parameters */
     PerlinNoiseGenerator(const PerlinNoiseParams& params,
-        GLuint octaves = 8)
+                         GLuint octaves = 8)
         : HeightMapGeneratorBase(params),
-        octaves(8)
+          octaves(8)
     { // Find value with given key
         PerlinNoiseParams params_copy = params;
         smooth = params_copy.get_param<GLfloat>("smooth", 2.0f);
@@ -717,10 +717,10 @@ public:
     /* Default constructor & Constructor
     ** Using parameters of Circle Strike Algorithm */
     HeightMapGenerator(const CircleStrikeParams& params,
-        GLuint _iterations = 100,
-        GLuint _stableIterNum = 100,
-        GLfloat _maxCrash = 1.0f,
-        GLfloat _minCrash = 0.1f)
+                       GLuint _iterations = 100,
+                       GLuint _stableIterNum = 100,
+                       GLfloat _maxCrash = 1.0f,
+                       GLfloat _minCrash = 0.1f)
     {
         _base_generator = new CircleStrikeGenerator(
             params, _iterations, _stableIterNum, _maxCrash, _minCrash);
@@ -731,7 +731,7 @@ public:
     /* Default constructor & Constructor
     ** Using parameters of Perlin Noise Algorithm */
     HeightMapGenerator(const PerlinNoiseParams& params,
-        GLuint octaves = 8)
+                       GLuint octaves = 8)
     {
         _base_generator = new PerlinNoiseGenerator(params, octaves);
         // Copy the parameters
