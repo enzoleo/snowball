@@ -11,6 +11,9 @@
 #ifndef _CAMERA_H_
 #define _CAMERA_H_
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 #include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -128,18 +131,47 @@ public:
         if (fovy >= 45.0f) fovy = 45.0f;
     }
 
-    /*void animate(const glm::vec3& _position,
-                 const glm::vec3& _up,
-                 const GLfloat _vecSpeed,
-                 const GLfloat _yaw = -90.0f,
-                 const GLfloat _pitch = 0.0f,
-                 const GLfloat _angleSpeed = 0.0f)
+    /* Move camera
+    ** Make simple animation */
+    GLboolean move(const glm::vec3& _position,
+                   const GLfloat _yaw,
+                   const GLfloat _pitch,
+                   const GLfloat _vecSpeed,
+                   const GLfloat _angleSpeed,
+                   const GLfloat deltaTime)
     {
-        position = (_position - position) * _vecSpeed + position;
-        up = (_up - up) * _vecSpeed + up;
-        yaw = (_yaw - yaw) * _angleSpeed + yaw;
-        pitch = (_pitch - pitch) * _angleSpeed + pitch;
-    }*/
+        // The boolean result
+        // If the targets and init value are so close that we could
+        // see them the same, the result will be true
+        GLboolean result = true;
+
+        // Determine whether to change position
+        glm::vec3 diffPos = _position - position;
+        if (!(fabs(diffPos.x) < 0.001f &&
+              fabs(diffPos.y) < 0.001f &&
+              fabs(diffPos.z) < 0.001f))
+        {
+            position = diffPos * _vecSpeed * deltaTime + position;
+            result = false;
+        }
+
+        // Determine whether to change yaw and pitch angle
+        if (!(fabs(_yaw - yaw) < 0.001f))
+        {
+            yaw = (_yaw - yaw) * _angleSpeed * deltaTime + yaw;
+            result = false;
+        }
+
+        if (!(fabs(_pitch - pitch) < 0.001f))
+        {
+            pitch = (_pitch - pitch) * _angleSpeed * deltaTime + pitch;
+            result = false;
+        }
+        
+        // Generate camera view parameters again
+        genCameraView();
+        return result;
+    }
 
 private:
 

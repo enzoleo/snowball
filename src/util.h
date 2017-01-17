@@ -26,10 +26,16 @@ Shader go_shader;
 Shader win_shader;
 
 // Camera
+/*Camera camera(
+    glm::vec3(0.0f, 5.0f, 20.0f),
+    glm::vec3(0.0f, 1.0f, 0.0f),
+    -90.0f, 0.0f
+);*/
+
 Camera camera(
-	glm::vec3(0.0f, 5.0f, 20.0f),
-	glm::vec3(0.0f, 1.0f, 0.0f),
-	-90.0f, 0.0f
+    glm::vec3(0.0f, 15.0f, 25.0f),
+    glm::vec3(0.0f, 1.0f, 0.0f),
+    -90.0f, 37.0f
 );
 
 
@@ -46,6 +52,7 @@ int num_frames = 0;
 GLfloat lastTime = 0.0f;
 GLboolean bGameOver = false;
 GLboolean bWin = false;
+GLboolean game_process_flag = false;
 
 
 // Textures
@@ -108,7 +115,7 @@ GLfloat offset_z = 0;
 
 
 // Terrains
-Terrain mini_terrain("../terrains/test.bmp");
+Terrain mini_terrain("../assets/terrains/test.bmp");
 
 
 // Particle system

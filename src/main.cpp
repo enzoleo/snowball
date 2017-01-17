@@ -299,9 +299,12 @@ void updateScene()
     }
 
     // Update camera
-    glm::vec3 cameraPos(currentX, 5.0f, currentZ + 16.0f);
-    camera.setPosition(cameraPos);
-    glm::mat4 projection = glm::perspective(camera.getFovy(), (float)window_width / (float)window_height, 0.1f, 300.0f);
+    if (game_process_flag)
+    {
+        glm::vec3 cameraPos(currentX, camera.getPosition().y, currentZ + 16.0f);
+        camera.setPosition(cameraPos);
+    }
+    glm::mat4 projection = glm::perspective(camera.getFovy(), (float)window_width / (float)window_height, 0.1f, 100.0f);
     glm::mat4 view = camera.getViewMat();
 
     // Update light settings
@@ -397,16 +400,16 @@ void updateScene()
     {
         GLfloat rotAngle = snowball.getRotAngle();
         GLfloat rotSpeed = snowball.getRotSpeed();
-        snowball.setRotAngle(rotAngle + rotSpeed * deltaTime);  //update
+        snowball.setRotAngle(rotAngle + rotSpeed * deltaTime);
     }
-    if (bTemp)
+    if (bTemp && game_process_flag)
     {
         GLfloat speed = snowball.getSpeed();
         GLfloat accelerator = snowball.getAccelerator();
-        snowball.setPositionZ(currentZ - speed * deltaTime);  //update
+        snowball.setPositionZ(currentZ - speed * deltaTime);
         snowball.setPositionY(snowball.getRadius());
-        snowball.setSpeed(speed + accelerator * deltaTime);  //update
-        snowball.setRadius(snowball.getRadius() - snowball.getMeltSpeed() * deltaTime);  //update
+        snowball.setSpeed(speed + accelerator * deltaTime);
+        snowball.setRadius(snowball.getRadius() - snowball.getMeltSpeed() * deltaTime);
 
         offset_z = speed * deltaTime;
         dist_total += offset_z;
@@ -647,6 +650,41 @@ int main()
     
     lastFrame = glfwGetTime();
     lastTime = glfwGetTime();
+    GLfloat camera_start_pos = snowball.getCurPosition().z + 16.0f;
+    
+    // --------------------------------------------------------------
+    // START ANIMATION
+    // Really simple animation - move camera.
+    // --------------------------------------------------------------
+    while (!glfwWindowShouldClose(window) && !game_process_flag)
+    {
+        // Set frame time
+        GLfloat currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        num_frames++;
+        GLfloat dt = currentFrame - lastTime;
+
+        // Check and call events
+        glfwPollEvents();
+        updateScene();
+        sm->Bind();
+        renderScene(depth_shader);
+        sm->Unbind();
+
+        glViewport(0, 0, window_width, window_height);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(0.2f, 0.3f, 0.3f, 0.0f);
+        renderScene(main_shader);
+
+        game_process_flag = camera.move(
+            glm::vec3(0.0f, 5.0f, camera_start_pos),
+            -90.0f, 0.0f, 0.1f, 0.1f, dt);
+
+        // This line must be here! Or the screen will flash!
+        glfwSwapBuffers(window);
+    }
+
     while (!glfwWindowShouldClose(window))
     {
         // Set frame time
@@ -654,7 +692,6 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         num_frames++;
-        
         GLfloat dt = currentFrame - lastTime;
 
         // Check and call events

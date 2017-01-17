@@ -238,12 +238,12 @@ class Ball : public Object
 {
 public:
     /* Default constructor */
-    Ball(GLfloat _radius = 1,
+    Ball(GLfloat _radius = 1.0f,
         GLint _slices = 40,
         GLint _stacks = 40,
-        GLfloat _kd = 1.0,
-        GLfloat _ks = 0.0,
-        GLfloat _shininess = 0.0)
+        GLfloat _kd = 1.0f,
+        GLfloat _ks = 0.0f,
+        GLfloat _shininess = 0.0f)
         : Object(_kd, _ks, _shininess),
         radius(_radius),
         slices(_slices),
@@ -335,15 +335,6 @@ public:
         glDisableVertexAttribArray(0);
         shader.uninstall();
     }
-
-    /* draw the ball with shader */
-    //void draw(Shader shader)
-    //{
-    //  // Install the shader
-    //  shader.install();
-    //  draw();
-    //  shader.uninstall();
-    //}
 
 protected:
 
@@ -450,7 +441,7 @@ public:
         meltSpeed(_meltSpeed)
     {
         curPosition.y = radius;
-        curPosition.z = radius * 20.0f / 3 -20;
+        curPosition.z = radius * 20.0f / 3 - 20.0f;
     }
 
     /* Return private members
