@@ -387,7 +387,6 @@ void updateScene()
         glm::mat4 temp = glm::translate(glm::mat4(), glm::vec3(0, 0, -200));
         if (updateA)  // update Scene A
         {
-            //std::cout << "update scene A " << std::endl;
             if (drawPlantA)
             {
                 for (int i = 0; i < num_grass; ++i)

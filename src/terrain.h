@@ -23,7 +23,9 @@
 #include "hmap_generator.h"
 #include "objects.h"
 
-#define _TERRAIN_NORMAL_SAVE_
+#ifdef _TERRAIN_NORMAL_SAVE_
+#undef _TERRAIN_NORMAL_SAVE_
+#endif
 #define _TERRAIN_HEIGHT_SMOOTH_
 
 /* STATIC FUNCTION

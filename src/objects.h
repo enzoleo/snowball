@@ -427,20 +427,20 @@ public:
     ** These variables are related to parameter `TIME`. However, in OpenGL we draw our
     ** scene for each `FRAME`. */
     SnowBall(GLfloat _radius = 1,
-        GLint _slices = 40,
-        GLint _stacks = 40,
-        GLfloat _kd = 1.0,
-        GLfloat _ks = 0.0,
-        GLfloat _shininess = 10,
-        GLfloat _rotAngle = 0.0f,
-        GLfloat _speed = 24.0f,
-        GLfloat _accelerator = 0.0f,
-        GLfloat _meltSpeed = 0.01f)
+             GLint _slices = 40,
+             GLint _stacks = 40,
+             GLfloat _kd = 1.0,
+             GLfloat _ks = 0.0,
+             GLfloat _shininess = 10,
+             GLfloat _rotAngle = 0.0f,
+             GLfloat _speed = 24.0f,
+             GLfloat _accelerator = 0.0f,
+             GLfloat _meltSpeed = 0.01f)
         : Ball(_radius, _slices, _stacks, _kd, _ks, _shininess),
-        rotAngle(_rotAngle),
-        speed(_speed),
-        accelerator(_accelerator),
-        meltSpeed(_meltSpeed)
+          rotAngle(_rotAngle),
+          speed(_speed),
+          accelerator(_accelerator),
+          meltSpeed(_meltSpeed)
     {
         curPosition.y = radius;
         curPosition.z = radius * 20.0f / 3 - 20.0f;
@@ -639,8 +639,6 @@ public:
         }
 
         begin_z = -spacing;
-        std::cout << "begin z = " << begin_z << std::endl;
-
     }
 
     /* PARAMETERIZED: Initialize the barrier queue */
@@ -674,13 +672,8 @@ public:
         type1 = rand() % num_barrier_types;
         barrier_types.pop_front();
         barrier_types.push_back(type0);
-        //std::cout << "first change " << std::endl;
-        //outputTypes();
         barrier_types.pop_front();
         barrier_types.push_back(type1);
-        //std::cout << "second change " << std::endl;
-        std::cout << "after update types " << std::endl;
-        outputTypes();
 
         glm::mat4 model;
         for (GLint i = -1; i < 2; ++i) {
@@ -692,14 +685,12 @@ public:
 #else
                 model = glm::rotate(model, rotSpeed, glm::vec3(0.0f, 1.0f, 0.0f));
 #endif
-                std::cout << "z of new barrier: " << begin_z - spacing * rowSize << std::endl;
                 model2worlds.pop_front();
                 model2worlds.push_back(model);
             }
         }
 
         begin_z -= spacing;
-        std::cout << "begin z = " << begin_z << std::endl;
     }
 
     /* Output the deque data to the console */
@@ -710,13 +701,6 @@ public:
         for (; iter != deque.end(); iter++)
             printf("%d ", *iter);
         printf("\n");
-    }
-
-    void outputTypes()
-    {
-        for (GLuint i = 0; i < rowSize * 2; i = i + 2) {
-            std::cout << "row " << i/2 << ": " << barrier_types[i] << ", " << barrier_types[i + 1] << std::endl;
-        }
     }
 
     void draw(Shader shader) 

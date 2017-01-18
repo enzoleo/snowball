@@ -70,8 +70,6 @@ public:
         GLuint specularNr = 1;
         GLuint normalNr = 1;
         GLuint heightNr = 1;
-
-        //std::cout << "how many textures does a grass mesh have? " << textures.size() << std::endl;
         
         for (GLuint i = 0; i < this->textures.size(); i++)
         {   
@@ -241,7 +239,7 @@ private:
         // Check for errors
         if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
         {
-            std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << std::endl;
+            std::cout << "ERROR: " << importer.GetErrorString() << std::endl;
             return;
         }
         // Retrieve the directory path of the filepath
