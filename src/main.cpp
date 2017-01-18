@@ -1,5 +1,8 @@
 #include <iostream>
 #include <time.h>
+#ifdef _WIN32
+#define _USE_MATH_DEFINES
+#endif
 #include <math.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -20,6 +23,18 @@
 #include "billboard.h"
 
 #define FULL_SCREEN_MODE
+
+#ifdef  _WIN32
+#pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "glew32.lib")
+#pragma comment(lib, "glfw3dll.lib")
+#pragma comment(lib, "SOIL.lib")
+#pragma comment(lib, "assimp.lib")
+#endif 
+
+inline GLfloat deg2rad(const GLfloat& deg) {
+	return (deg / 180) * M_PI;
+}
 
 /* Function prototypes for moving the camera and changing viewing direction */
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -101,16 +116,15 @@ void initScene()
 
     // Load textures
     texture_grass.reload("../assets/textures/grass.jpg"); texture_grass.setUnit(1);
-    texture_rock.reload("../assets/textures/rock.jpg"); texture_rock.setUnit(2);
-    texture_mud.reload("../assets/textures/mud.jpg"); texture_mud.setUnit(3);
-    texture_snow.reload("../assets/textures/snow.jpg"); texture_snow.setUnit(4);
-    texture_snowflake.reload("../assets/textures/snowflake.png"); texture_snowflake.setUnit(5);
-    texture_white.reload("../assets/textures/white.jpg"); texture_white.setUnit(6);
-    texture_billboard.reload("../assets/textures/billboard.png"); texture_billboard.setUnit(7);
-    texture_wood.reload("../assets/textures/container.jpg"); texture_wood.setUnit(8);
-    texture_gameover.reload("../assets/textures/gameover.png"); texture_gameover.setUnit(9);
-    texture_win.reload("../assets/textures/win.png"); texture_win.setUnit(10);
-    texture_sbb.reload("../assets/textures/snowball_barrier.jpg"); texture_sbb.setUnit(11);
+    texture_mud.reload("../assets/textures/mud.jpg"); texture_mud.setUnit(2);
+    texture_snow.reload("../assets/textures/snow.jpg"); texture_snow.setUnit(3);
+    texture_snowflake.reload("../assets/textures/snowflake.png"); texture_snowflake.setUnit(4);
+    texture_white.reload("../assets/textures/white.jpg"); texture_white.setUnit(5);
+    texture_billboard.reload("../assets/textures/billboard.png"); texture_billboard.setUnit(6);
+    texture_wood.reload("../assets/textures/container.jpg"); texture_wood.setUnit(7);
+    texture_gameover.reload("../assets/textures/gameover.png"); texture_gameover.setUnit(8);
+    texture_win.reload("../assets/textures/win.png"); texture_win.setUnit(9);
+    texture_sbb.reload("../assets/textures/snowball_barrier.jpg"); texture_sbb.setUnit(10);
 
     // Load Shaders
     main_shader.reload("../assets/shaders/main.vert", "../assets/shaders/main.frag");
@@ -188,12 +202,20 @@ void initScene()
             int temp = -50 * i;
             glm::mat4 model;
             model = glm::translate(glm::mat4(), glm::vec3(-10, 0, temp));
-            model = glm::rotate(model, (float)90.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
+#ifdef _WIN32
+			model = glm::rotate(model, (GLfloat)M_PI_2, glm::vec3(-1.0f, 0.0f, 0.0f));
+#else
+            model = glm::rotate(model, (GLfloat)90.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
+#endif
             model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
             treeModelMatsA.push_back(model);
             treeModelMatsB.push_back(trans * model);
             model = glm::translate(glm::mat4(), glm::vec3(10, 0, temp));
-            model = glm::rotate(model, (float)90.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
+#ifdef _WIN32
+			model = glm::rotate(model, (GLfloat)M_PI_2, glm::vec3(-1.0f, 0.0f, 0.0f));
+#else
+            model = glm::rotate(model, (GLfloat)90.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
+#endif
             model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
             treeModelMatsA.push_back(model);
             treeModelMatsB.push_back(trans * model);
@@ -203,8 +225,12 @@ void initScene()
     {
         glm::mat4 model;
         model = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, -50.0f));
+#ifdef _WIN32
+		model = glm::rotate(model, (GLfloat)M_PI_2, glm::vec3(1.0f, 0.0f, 0.0f));
+#else
         model = glm::rotate(model, (GLfloat)90.0f, glm::vec3(1.0f, 0.0f, 0.0f)); //the angle's unit is radian!!!
-        model = glm::scale(model, glm::vec3(200.0f, 100.0f, 1.0f));
+#endif        
+		model = glm::scale(model, glm::vec3(200.0f, 100.0f, 1.0f));
         pathModelMatA = model;
         pathModelMatB = trans * model;
     }
@@ -224,7 +250,11 @@ void initScene()
     {
         glm::mat4 model;
         model = glm::translate(glm::mat4(), glm::vec3(20.0f, 0.0f, -3014.0f));
+#ifdef _WIN32
+		model = glm::rotate(model, (GLfloat)M_PI_2, glm::vec3(0, 1, 0));
+#else
         model = glm::rotate(model, (GLfloat)90.0f, glm::vec3(0, 1, 0));
+#endif
         model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
         snowhouse.setModelMatrix(model);
     }
@@ -492,7 +522,7 @@ void updateScene()
             //eat this food
             if (abs(currentX - foodPositionX[0]) < 1.0f) 
             {
-                std::cout << "Eat Food! (1 food)" << std::endl;
+                
                 snowball.setRadius(snowball.getRadius() + 0.01);
             }
             else if (currentX < safePositionX - 1.2f ||
@@ -510,7 +540,7 @@ void updateScene()
             if (currentX < safePositionX - 1.2f ||
                 currentX > safePositionX + 1.2f) 
             {
-                std::cout << "Eat Food! (2 food) " << std::endl;
+               
                 snowball.setRadius(snowball.getRadius() + 0.01);
             }
         }
@@ -520,7 +550,7 @@ void updateScene()
 
         // No need to update queue if the score is two low
         if (score >= deque.size() / 2) {
-            std::cout << "update when score is " << score << std::endl;
+           
             barriers.update();
         }
     }
@@ -615,7 +645,11 @@ void renderScene(Shader shader)
     // Draw snowball
     GLfloat radius = snowball.getRadius();
     model = glm::translate(glm::mat4(), glm::vec3(currentX, currentY, currentZ));
+#ifdef _WIN32
+	model = glm::rotate(model, deg2rad(snowball.getRotAngle()), glm::vec3(-1.0f, 0.0f, 0.0f));
+#else
     model = glm::rotate(model, snowball.getRotAngle(), glm::vec3(-1.0f, 0.0f, 0.0f));
+#endif
     model = glm::scale(model, glm::vec3(radius, radius, radius));
     snowball.setModelMatrix(model);
     snowball.draw(shader);

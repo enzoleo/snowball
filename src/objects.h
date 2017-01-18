@@ -20,6 +20,8 @@
 #include "texture.h"
 #include "shader.hpp"
 
+extern GLfloat deg2rad(const GLfloat& deg);
+
 /* CLASS: Object (base class) */
 class Object
 {
@@ -625,7 +627,11 @@ public:
                     // Draw barrier at each unsafe position
                     model = glm::translate(glm::mat4(), glm::vec3(pos * 3.0f, 0.0f, barrierLoop));
                     model = glm::translate(model, glm::vec3(0.0f, baseline, 0.0f));
+#ifdef _WIN32
+					model = glm::rotate(model, deg2rad(rotSpeed), glm::vec3(0.0f, 1.0f, 0.0f));
+#else
                     model = glm::rotate(model, rotSpeed, glm::vec3(0.0f, 1.0f, 0.0f));
+#endif
                     model2worlds.push_back(model);
                 }
             }
@@ -681,7 +687,11 @@ public:
             if (i != safeLane) {
                 model = glm::translate(glm::mat4(), glm::vec3(i * 3.0f, 0.0f, begin_z - spacing * rowSize));
                 model = glm::translate(model, glm::vec3(0.0f, baseline, 0.0f));
+#ifdef _WIN32
+				model = glm::rotate(model, deg2rad(rotSpeed), glm::vec3(0.0f, 1.0f, 0.0f));
+#else
                 model = glm::rotate(model, rotSpeed, glm::vec3(0.0f, 1.0f, 0.0f));
+#endif
                 std::cout << "z of new barrier: " << begin_z - spacing * rowSize << std::endl;
                 model2worlds.pop_front();
                 model2worlds.push_back(model);
