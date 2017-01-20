@@ -701,9 +701,9 @@ int main()
         // Check and call events
         glfwPollEvents();
         updateScene();
-        sm->Bind();
+        sm->bind();
         renderScene(depth_shader);
-        sm->Unbind();
+        sm->unbind();
 
         glViewport(0, 0, window_width, window_height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -732,9 +732,9 @@ int main()
         move_func(); 
         updateScene();
 
-        sm->Bind();
+        sm->bind();
         renderScene(depth_shader);
-        sm->Unbind();
+        sm->unbind();
 
         glViewport(0, 0, window_width, window_height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

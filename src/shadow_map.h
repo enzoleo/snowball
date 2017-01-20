@@ -17,61 +17,77 @@
 class ShadowMap
 {
 public:
-    ShadowMap(GLuint w, GLuint h)
-    {
-        width = w;
-        height = h;
 
-        glGenFramebuffers(1, &depthMapFBO);
-
-        glGenTextures(1, &depthMap);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
-            width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        GLfloat borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
-        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-
-        glDrawBuffer(GL_NONE);
-        glReadBuffer(GL_NONE);
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    /* Default constructor & Constructor */
+    ShadowMap(GLuint _width, GLuint _height)
+        : width(_width),
+          height(_height)
+    { // Do initialization
+        init();
     }
-    ~ShadowMap() {}
 
-    void Bind()
+    /* Bind the buffer (shadow map) */
+    void bind()
     {
         glViewport(0, 0, width, height);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-
         glClear(GL_DEPTH_BUFFER_BIT);
     }
-    void Unbind()
+
+    /* Unbind the buffer (shadow map) */
+    void unbind()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    GLuint getDepthMap() {
-        return depthMap;
-    }
+     /* Returns the private members
+    ** We set the shadow map settings private, because they are not supposed to be
+    ** editted easily. If they need to be editted, call the `set*` functions, which makes
+    ** sure you edit them on purpose, instead of unconsciously. */
+    const GLuint getDepthMap() { return depthMap; }
+    const GLuint getWidth() { return width; }
+    const GLuint getHeight() { return height; }
 
 private:
 
-    GLuint width;
-    GLuint height;
+    /* PRIVATE MEMBER:
+    ** Do Initialization */
+    void init()
+    {
+        // Generate frame buffers
+        glGenFramebuffers(1, &depthMapFBO);
 
-    GLuint depthMapFBO;
-    GLuint depthMap;
+        // Generate and bind textures
+        glGenTextures(1, &depthMap);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+                     width, height, 0, GL_DEPTH_COMPONENT,
+                     GL_FLOAT, 0);
+
+        // Texture parameters settings
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+        GLfloat white[] = { 1.0, 1.0, 1.0, 1.0 };
+        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, white);
+
+        // Bind and draw frame buffer (then unbind it)
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    /* PRIVATE MEMBERS:
+    ** The width and height of the shadow map */
+    GLuint width, height;
+
+    /* PRIVATE MEMBERS
+    ** The depthMap and its FBO */
+    GLuint depthMapFBO, depthMap;
 };
 
 #endif
