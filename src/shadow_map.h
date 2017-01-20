@@ -13,13 +13,14 @@
 
 #include <GL/glew.h>
 
+/* CLASS: Showmap */
 class ShadowMap
 {
 public:
     ShadowMap(GLuint w, GLuint h)
     {
-        WIDTH = w;
-        HEIGHT = h;
+        width = w;
+        height = h;
 
         glGenFramebuffers(1, &depthMapFBO);
 
@@ -27,13 +28,10 @@ public:
         glBindTexture(GL_TEXTURE_2D, depthMap);
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
-            WIDTH, HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+            width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);  //for the last parameter, is GL_CLAMP_TO_BORDER better? 
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);  //for the last parameter, is GL_CLAMP_TO_BORDER better? 
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
@@ -53,7 +51,7 @@ public:
 
     void Bind()
     {
-        glViewport(0, 0, WIDTH, HEIGHT);
+        glViewport(0, 0, width, height);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 
         glClear(GL_DEPTH_BUFFER_BIT);
@@ -68,8 +66,9 @@ public:
     }
 
 private:
-    GLuint WIDTH;
-    GLuint HEIGHT;
+
+    GLuint width;
+    GLuint height;
 
     GLuint depthMapFBO;
     GLuint depthMap;

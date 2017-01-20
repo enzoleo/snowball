@@ -25,13 +25,6 @@ Shader billboard_shader;
 Shader go_shader;
 Shader win_shader;
 
-// Camera
-/*Camera camera(
-    glm::vec3(0.0f, 5.0f, 20.0f),
-    glm::vec3(0.0f, 1.0f, 0.0f),
-    -90.0f, 0.0f
-);*/
-
 Camera camera(
     glm::vec3(0.0f, 15.0f, 25.0f),
     glm::vec3(0.0f, 1.0f, 0.0f),
