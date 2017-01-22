@@ -1,0 +1,25 @@
+language: cpp
+sudo: false
+branches:
+    only:
+        - master
+compiler:
+    - g++
+os:
+    - linux
+addons:
+    apt:
+        sources:
+            - kubuntu-backports
+        packages:
+            - cmake
+script:
+    - mkdir build
+    - cd build
+    - cmake ..
+notifications:
+    email:
+        recipients:
+            - enzoliao95@gmail.com
+    on_success: never
+    on_failure: always

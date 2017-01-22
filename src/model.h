@@ -12,13 +12,10 @@
 #define _MODEL_H_
 
 #include <string>
-#include <fstream>
-#include <iostream>
 #include <vector>
-
+#include <iostream>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
-
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -27,38 +24,42 @@
 #include "shader.hpp"
 #include "texture.h"
 
-struct Vertex
+/* STRUCT: The struct of mesh vertex
+** Each member is important in Mesh class */
+struct MeshVertex
 {
-    // Position
-    glm::vec3 Position;
-    // Normal
-    glm::vec3 Normal;
-    // TexCoords
-    glm::vec2 TexCoords;
-    // Tangent
-    glm::vec3 Tangent;
-    // Bitangent
-    glm::vec3 Bitangent;
+    /* The position coordinates of vertices */
+    glm::vec3 position;
+    /* The normals of vertices */
+    glm::vec3 normal;
+    /* The texture coordinates of vertices */
+    glm::vec2 texCoords;
+    /* The tangent vector of vertices */
+    glm::vec3 tangent;
+    /* The bitangent vector of vertices */
+    glm::vec3 bitangent;
 };
 
-class Mesh {
+/* CLASS: Mesh */
+class Mesh 
+{
 public:
     /*  Mesh Data  */
-    std::vector<Vertex> vertices;
+    std::vector<MeshVertex> vertices;
     std::vector<GLuint> indices;
     std::vector<Texture> textures;
     GLuint VAO;
 
-    /*  Functions  */
-    // Constructor
-    Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Texture> textures)
+    /* Default constructor & Constructor */
+    Mesh(std::vector<MeshVertex> _vertices,
+         std::vector<GLuint> _indices,
+         std::vector<Texture> _textures)
+        : vertices(_vertices),
+          indices(_indices),
+          textures(_textures)
     {
-        this->vertices = vertices;
-        this->indices = indices;
-        this->textures = textures;
-
-        // Now that we have all the required data, set the vertex buffers and its attribute pointers.
-        this->setupMesh();
+        // Set up the mesh
+        setup();
     }
 
     // Render the mesh
@@ -112,42 +113,33 @@ private:
     /*  Render data  */
     GLuint VBO, EBO;
 
-    /*  Functions    */
-    // Initializes all the buffer objects/arrays
-    void setupMesh()
+    /* PRIVATE MEMBER: Do mesh SET UP.
+    ** Initializes all the buffer objects/arrays */
+    void setup()
     {
-        // Create buffers/arrays
-        glGenVertexArrays(1, &this->VAO);
+        // Create VAO (arrays), VBO and EBO (buffers)
+        glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &this->VBO);
         glGenBuffers(1, &this->EBO);
+        glBindVertexArray(VAO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-        glBindVertexArray(this->VAO);
-        glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-        // A great thing about structs is that their memory layout is sequential for all its items.
-        // The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
-        // again translates to 3/2 floats which translates to a byte array.
-        glBufferData(GL_ARRAY_BUFFER, this->vertices.size() * sizeof(Vertex), &this->vertices[0], GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->indices.size() * sizeof(GLuint), &this->indices[0], GL_STATIC_DRAW);
+        // The memory layout of structs is sequential for all its items.
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(MeshVertex), &vertices[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
 
         // Set the vertex attribute pointers
-        // Vertex Positions
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
-        // Vertex Normals
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (GLvoid*)0);
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, Normal));
-        // Vertex Texture Coords
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (GLvoid*)offsetof(MeshVertex, normal));
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, TexCoords));
-        // Vertex Tangent
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (GLvoid*)offsetof(MeshVertex, texCoords));
         glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, Tangent));
-        // Vertex Bitangent
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (GLvoid*)offsetof(MeshVertex, tangent));
         glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, Bitangent));
-
+        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (GLvoid*)offsetof(MeshVertex, bitangent));
         glBindVertexArray(0);
     }
 };
@@ -215,12 +207,12 @@ public:
         }
     }
 
-    void loadFromFile(const std::string& path) 
+    void load_from_file(const std::string& path) 
     { 
         this->loadModel(path); 
     }
 
-    void loadFromFiles(const std::string & model_path, const std::string & texture_path, const std::string& type = "diffuse")
+    void load_from_files(const std::string & model_path, const std::string & texture_path, const std::string& type = "diffuse")
     {
         this->loadModel(model_path);
         if (textures_loaded.size() == 0) {
@@ -271,25 +263,25 @@ private:
     Mesh processMesh(aiMesh* mesh, const aiScene* scene)
     {
         // Data to fill
-        std::vector<Vertex> vertices;
+        std::vector<MeshVertex> vertices;
         std::vector<GLuint> indices;
         std::vector<Texture> textures;
 
         // Walk through each of the mesh's vertices
         for (GLuint i = 0; i < mesh->mNumVertices; i++)
         {
-            Vertex vertex;
+            MeshVertex vertex;
             glm::vec3 vector; // We declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
                               // Positions
             vector.x = mesh->mVertices[i].x;
             vector.y = mesh->mVertices[i].y;
             vector.z = mesh->mVertices[i].z;
-            vertex.Position = vector;
+            vertex.position = vector;
             // Normals
             vector.x = mesh->mNormals[i].x;
             vector.y = mesh->mNormals[i].y;
             vector.z = mesh->mNormals[i].z;
-            vertex.Normal = vector;
+            vertex.normal = vector;
             // Texture Coordinates
             if (mesh->mTextureCoords[0]) // Does the mesh contain texture coordinates?
             {
@@ -298,23 +290,23 @@ private:
                 // use models where a vertex can have multiple texture coordinates so we always take the first set (0).
                 vec.x = mesh->mTextureCoords[0][i].x;
                 vec.y = mesh->mTextureCoords[0][i].y;
-                vertex.TexCoords = vec;
+                vertex.texCoords = vec;
             }
             else
-                vertex.TexCoords = glm::vec2(0.0f, 0.0f);
+                vertex.texCoords = glm::vec2(0.0f, 0.0f);
             // Tangent
             if (mesh->mTangents) {
                 vector.x = mesh->mTangents[i].x;
                 vector.y = mesh->mTangents[i].y;
                 vector.z = mesh->mTangents[i].z;
-                vertex.Tangent = vector;
+                vertex.tangent = vector;
             }
             // Bitangent
             if (mesh->mBitangents) {
                 vector.x = mesh->mBitangents[i].x;
                 vector.y = mesh->mBitangents[i].y;
                 vector.z = mesh->mBitangents[i].z;
-                vertex.Bitangent = vector;
+                vertex.bitangent = vector;
             }
             vertices.push_back(vertex);
         }

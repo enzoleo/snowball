@@ -154,9 +154,9 @@ void initScene()
     barrier_cube.setup();
 
     // Load models
-    grass.loadFromFiles("../assets/models/grass/grass.obj", "../assets/models/grass/grass.png");
-    tree.loadFromFile("../assets/models/tree/tree.3ds");
-    snowhouse.loadFromFile("../assets/models/snow_house/Snow covered CottageOBJ.obj");
+    grass.load_from_files("../assets/models/grass/grass.obj", "../assets/models/grass/grass.png");
+    tree.load_from_file("../assets/models/tree/tree.3ds");
+    snowhouse.load_from_file("../assets/models/snow_house/Snow covered CottageOBJ.obj");
 
     // Initialize particle system, shadow map and others
     ps = new ParticleSystem(particle_shader, texture_snowflake, glm::vec3(0, 30.0f, -2050), 1000, 50, 50);
