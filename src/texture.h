@@ -13,17 +13,38 @@
 
 #include <string>
 #include <GL/glew.h>
-#include <SOIL/SOIL.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <assimp/types.h>
+
+/* The texture type
+** Determined by image extension name
+** Attention: The enum options after TEXTURE_JPG
+**     all support transparency */
+enum TextureImgType
+{
+    TEXTURE_BMP,
+    TEXTURE_JPG,
+    TEXTURE_PNG,
+    TEXTURE_DDS,
+    TEXTURE_TGA
+};
 
 /* CLASS: Texture */
 class Texture
 {
 public:
     /* Default constructor */
-    Texture()
-        : level(0), border(0), type("diffuse"), path("./textures"), unit(0)
+    Texture(const std::string& _type = "diffuse",
+            const std::string& _path = "./textures",
+            TextureImgType _imgType = TEXTURE_BMP)
+        : level(0),
+          border(0),
+          type(_type),
+          unit(0),
+          imgType(_imgType)
     { // Do nothing here
+        path = aiString(_path);
     }
 
     /* Load image and bind texture */
@@ -33,9 +54,23 @@ public:
     }
 
     /* Reload image and rebind this texture */
-    void reload(const char* image_path)
+    void reload(const char* image_path,
+                TextureImgType _imgType = TEXTURE_BMP)
     {
-        unsigned char* image = SOIL_load_image(image_path, &width, &height, 0, SOIL_LOAD_RGBA);
+        // Load SDL surface
+        path = image_path;
+        SDL_Surface *surface = IMG_Load(image_path);
+
+        // The width and height of the texture
+        width = surface->w;
+        height = surface->h;
+        imgType = _imgType;
+
+        // If the texture supports transparency
+        if (imgType > TEXTURE_JPG)
+        { // Convert surface format to enable transparency loading
+            surface = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_ABGR8888, 0);
+        }
         // Make room for our texture
         glGenTextures(1, &id);
         // Tell OpenGL which texture to edit and map the image to the texture
@@ -46,14 +81,27 @@ public:
         // Learn more about this function:
         // https://www.khronos.org/opengles/sdk/docs/man/xhtml/glTexImage2D.xml
         // ----------------------------------------------------------------------------------------
-        glTexImage2D(GL_TEXTURE_2D, level, GL_RGBA,
-                     width, height, border,
-                     GL_RGBA, GL_UNSIGNED_BYTE, image);
+        if (imgType > TEXTURE_JPG)
+        { // If the texture supports transparency
+            glTexImage2D(GL_TEXTURE_2D, level, GL_RGBA,
+                         width, height, border,
+                         GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+        }
+        else
+        { // Set RGB mode if transparency is not enabled
+            glTexImage2D(GL_TEXTURE_2D, level, GL_RGB,
+                         width, height, border,
+                         GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
+        }
 
+        // Generate texture mipmap
         glGenerateMipmap(GL_TEXTURE_2D);
-        SOIL_free_image_data(image);
-        path = image_path;
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_2D, 0);
+        SDL_FreeSurface(surface);
     }
 
     /* The function binds this texture */
@@ -123,51 +171,70 @@ private:
     ** The texture unit this texture binds */
     GLuint unit;
 
+    /* PRIVATE MEMBER
+    ** The image type of texture */
+    TextureImgType imgType;
+
 };
 
-GLuint TextureFromFileDir(const char* path, std::string directory, bool gamma = false)
+GLuint TextureFromFileDir(const char* path, std::string directory)
 {
-        //Generate texture ID and load texture data 
-        std::string filename(path);
-        filename = directory + '/' + filename;
-        GLuint textureID;
-        glGenTextures(1, &textureID);
-        int width, height;
-        unsigned char* image = SOIL_load_image(filename.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
-        // Assign texture to ID
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, gamma ? GL_SRGB : GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-        glGenerateMipmap(GL_TEXTURE_2D);
+    //Generate texture ID and load texture data 
+    std::string filename(path);
+    filename = directory + '/' + filename;
+    int width, height;
 
-        // Parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glBindTexture(GL_TEXTURE_2D, 0);
+    SDL_Surface* surface = IMG_Load(filename.c_str());
+    width = surface->w;
+    height = surface->h;
         
-        return textureID;
+    // Assign texture to ID
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                         width, height, 0,
+                         GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
+
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    // Parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+        
+    SDL_FreeSurface(surface);
+    return textureID;
 }
 
 //filename contains its directory
-GLuint TextureFromFile(const char* filename, bool gamma = false) {
-        GLuint textureID;
-        glGenTextures(1, &textureID);
-        int width, height;
-        unsigned char* image = SOIL_load_image(filename, &width, &height, 0, SOIL_LOAD_RGB);
+GLuint TextureFromFile(const char* filename)
+{
+    int width, height;
+    SDL_Surface* surface = IMG_Load(filename);
+    width = surface->w;
+    height = surface->h;
 
-        // Assign texture to ID
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, gamma ? GL_SRGB : GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-        glGenerateMipmap(GL_TEXTURE_2D);
+    // Assign texture to ID
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                         width, height, 0,
+                         GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
+    glGenerateMipmap(GL_TEXTURE_2D);
 
-        // Parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        return textureID;
+    // Parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    SDL_FreeSurface(surface);
+    return textureID;
 }
 
 #endif

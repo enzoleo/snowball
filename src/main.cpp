@@ -9,7 +9,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <SOIL/SOIL.h>
 
 #include "shader.hpp"
 #include "camera.h"
@@ -32,10 +31,6 @@
 #pragma comment(lib, "assimp.lib")
 #endif 
 
-inline GLfloat deg2rad(const GLfloat& deg) {
-	return (deg / 180) * M_PI;
-}
-
 /* Function prototypes for moving the camera and changing viewing direction */
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -46,19 +41,46 @@ void move_func();
 void screenshot()
 {
     // Declare a string (the name of the screenshot)
-    // ATTENTION: here the screenshots are always BMP files
-    std::string filename = "../screenshots/screenshot" + std::to_string(num_screenshots) + ".bmp";
+    // ATTENTION: here the screenshots are always PNG files
+    std::string filename = "../screenshots/screenshot" + std::to_string(num_screenshots) + ".png";
 
-    // Use SOIL library to export image file
-    GLint save_result = SOIL_save_screenshot
-    (
-        filename.c_str(),
-        SOIL_SAVE_TYPE_BMP,
-        0, 0,
-        window_width,
-        window_height
+    // We need 4 bytes for RGBA pixels
+    unsigned char* pixels = new unsigned char[window_width * window_height * 4];
+    glReadPixels(0, 0, window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+    
+    // ----------------------------------------------------------------------
+    // Function `glReadPixels` reads the given rectangle from bottom-left to
+    // top-right, which means that our screenshot is upside down. So we must
+    // reverse the image pointer by hand.
+    // Attention:
+    //     For an image, the double-loop below may cost plenty of time. Thus
+    //     remember to use it carefully.
+    // ----------------------------------------------------------------------
+    for (int y = 0; y < window_height / 2; y++)
+    {
+        const int swapY = window_height - y - 1;
+        for (int x = 0; x < window_width; x++)
+        {
+            const int offset = 4 * (x + y * window_width);
+            const int swapOffset = 4 * (x + swapY * window_width);
+
+            // Swap R, G and B of the 2 pixels
+            std::swap<unsigned char>(pixels[offset + 0], pixels[swapOffset + 2]);
+            std::swap<unsigned char>(pixels[offset + 1], pixels[swapOffset + 1]);
+            std::swap<unsigned char>(pixels[offset + 2], pixels[swapOffset + 0]);
+            std::swap<unsigned char>(pixels[offset + 3], pixels[swapOffset + 3]);
+        }
+    }
+
+    // Create a SDL surface by computed pointer
+    SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(
+        pixels, window_width, window_height, 32,
+        window_width * 4, 0, 0, 0, 0
     );
-    num_screenshots++;
+    // Save screenshot surface as PNG file
+    IMG_SavePNG(surface, filename.c_str());
+    SDL_FreeSurface(surface);
+    delete [] pixels;
 }
 
 /* GLOBAL: INITIATION
@@ -115,16 +137,16 @@ void initScene()
     srand(time(0));  
 
     // Load textures
-    texture_grass.reload("../assets/textures/grass.jpg"); texture_grass.setUnit(1);
-    texture_mud.reload("../assets/textures/mud.jpg"); texture_mud.setUnit(2);
-    texture_snow.reload("../assets/textures/snow.jpg"); texture_snow.setUnit(3);
-    texture_snowflake.reload("../assets/textures/snowflake.png"); texture_snowflake.setUnit(4);
-    texture_white.reload("../assets/textures/white.jpg"); texture_white.setUnit(5);
-    texture_billboard.reload("../assets/textures/billboard.png"); texture_billboard.setUnit(6);
-    texture_wood.reload("../assets/textures/container.jpg"); texture_wood.setUnit(7);
-    texture_gameover.reload("../assets/textures/gameover.png"); texture_gameover.setUnit(8);
-    texture_win.reload("../assets/textures/win.png"); texture_win.setUnit(9);
-    texture_sbb.reload("../assets/textures/snowball_barrier.jpg"); texture_sbb.setUnit(10);
+    texture_grass.reload("../assets/textures/grass.jpg", TEXTURE_JPG); texture_grass.setUnit(1);
+    texture_mud.reload("../assets/textures/mud.jpg", TEXTURE_JPG); texture_mud.setUnit(2);
+    texture_snow.reload("../assets/textures/snow.jpg", TEXTURE_JPG); texture_snow.setUnit(3);
+    texture_snowflake.reload("../assets/textures/snowflake.png", TEXTURE_PNG); texture_snowflake.setUnit(4);
+    texture_white.reload("../assets/textures/white.jpg", TEXTURE_JPG); texture_white.setUnit(5);
+    texture_billboard.reload("../assets/textures/billboard.png", TEXTURE_PNG); texture_billboard.setUnit(6);
+    texture_wood.reload("../assets/textures/container.jpg", TEXTURE_JPG); texture_wood.setUnit(7);
+    texture_gameover.reload("../assets/textures/gameover.png", TEXTURE_PNG); texture_gameover.setUnit(8);
+    texture_win.reload("../assets/textures/win.png", TEXTURE_PNG); texture_win.setUnit(9);
+    texture_sbb.reload("../assets/textures/snowball_barrier.jpg", TEXTURE_JPG); texture_sbb.setUnit(10);
 
     // Load Shaders
     main_shader.reload("../assets/shaders/main.vert", "../assets/shaders/main.frag");
@@ -156,7 +178,7 @@ void initScene()
     // Load models
     grass.load_from_files("../assets/models/grass/grass.obj", "../assets/models/grass/grass.png");
     tree.load_from_file("../assets/models/tree/tree.3ds");
-    snowhouse.load_from_file("../assets/models/snow_house/Snow covered CottageOBJ.obj");
+    snowhouse.load_from_file("../assets/models/snow_house/SnowCoveredCottageOBJ.obj");
 
     // Initialize particle system, shadow map and others
     ps = new ParticleSystem(particle_shader, texture_snowflake, glm::vec3(0, 30.0f, -2050), 1000, 50, 50);
@@ -203,7 +225,7 @@ void initScene()
             glm::mat4 model;
             model = glm::translate(glm::mat4(), glm::vec3(-10, 0, temp));
 #ifdef _WIN32
-			model = glm::rotate(model, (GLfloat)M_PI_2, glm::vec3(-1.0f, 0.0f, 0.0f));
+            model = glm::rotate(model, (GLfloat)M_PI_2, glm::vec3(-1.0f, 0.0f, 0.0f));
 #else
             model = glm::rotate(model, (GLfloat)90.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
 #endif
@@ -212,7 +234,7 @@ void initScene()
             treeModelMatsB.push_back(trans * model);
             model = glm::translate(glm::mat4(), glm::vec3(10, 0, temp));
 #ifdef _WIN32
-			model = glm::rotate(model, (GLfloat)M_PI_2, glm::vec3(-1.0f, 0.0f, 0.0f));
+            model = glm::rotate(model, (GLfloat)M_PI_2, glm::vec3(-1.0f, 0.0f, 0.0f));
 #else
             model = glm::rotate(model, (GLfloat)90.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
 #endif
@@ -226,11 +248,11 @@ void initScene()
         glm::mat4 model;
         model = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, -50.0f));
 #ifdef _WIN32
-		model = glm::rotate(model, (GLfloat)M_PI_2, glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::rotate(model, (GLfloat)M_PI_2, glm::vec3(1.0f, 0.0f, 0.0f));
 #else
         model = glm::rotate(model, (GLfloat)90.0f, glm::vec3(1.0f, 0.0f, 0.0f)); //the angle's unit is radian!!!
 #endif        
-		model = glm::scale(model, glm::vec3(200.0f, 100.0f, 1.0f));
+        model = glm::scale(model, glm::vec3(200.0f, 100.0f, 1.0f));
         pathModelMatA = model;
         pathModelMatB = trans * model;
     }
@@ -251,7 +273,7 @@ void initScene()
         glm::mat4 model;
         model = glm::translate(glm::mat4(), glm::vec3(20.0f, 0.0f, -3014.0f));
 #ifdef _WIN32
-		model = glm::rotate(model, (GLfloat)M_PI_2, glm::vec3(0, 1, 0));
+        model = glm::rotate(model, (GLfloat)M_PI_2, glm::vec3(0, 1, 0));
 #else
         model = glm::rotate(model, (GLfloat)90.0f, glm::vec3(0, 1, 0));
 #endif
@@ -645,7 +667,7 @@ void renderScene(Shader shader)
     GLfloat radius = snowball.getRadius();
     model = glm::translate(glm::mat4(), glm::vec3(currentX, currentY, currentZ));
 #ifdef _WIN32
-	model = glm::rotate(model, deg2rad(snowball.getRotAngle()), glm::vec3(-1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, deg2rad(snowball.getRotAngle()), glm::vec3(-1.0f, 0.0f, 0.0f));
 #else
     model = glm::rotate(model, snowball.getRotAngle(), glm::vec3(-1.0f, 0.0f, 0.0f));
 #endif
@@ -744,6 +766,9 @@ int main()
         // This line must be here! Or the screen will flash!
         glfwSwapBuffers(window);
     }
+
+    PerlinNoiseGenerator pg;
+    pg.generate("ok.png");
 
     glfwTerminate();
     return 0;

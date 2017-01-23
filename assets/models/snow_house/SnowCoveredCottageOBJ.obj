@@ -1,6 +1,6 @@
 # This file uses centimeters as units for non-parametric coordinates.
 
-mtllib Snow covered CottageOBJ.mtl
+mtllib SnowCoveredCottageOBJ.mtl
 g default
 v -27.744078 -0.809079 45.828236
 v 28.300514 -0.809079 45.828236

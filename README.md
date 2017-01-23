@@ -1,4 +1,6 @@
 # SnowballRun
+[![Build Status](https://travis-ci.org/perryleo/SnowballRun.png?branch=master)](https://travis-ci.org/perryleo/SnowballRun)
+
 ### *Movement*
 
 ***Final project of Computer Graphics***. *We are supposed to preview the basic concepts in graphics and do coding practice. Always welcome constructive criticism and suggestions!*

@@ -228,6 +228,7 @@ private:
         // Read file via ASSIMP
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_GenNormals);
+
         // Check for errors
         if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
         {
@@ -236,7 +237,6 @@ private:
         }
         // Retrieve the directory path of the filepath
         this->directory = path.substr(0, path.find_last_of('/'));
-
         // Process ASSIMP's root node recursively
         this->processNode(scene->mRootNode, scene);
     }
@@ -252,12 +252,13 @@ private:
             aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
             this->meshes.push_back(this->processMesh(mesh, scene));
         }
+
         // After we've processed all of the meshes (if any) we then recursively process each of the children nodes
         for (GLuint i = 0; i < node->mNumChildren; i++)
         {
             this->processNode(node->mChildren[i], scene);
         }
-
+        std::cout << this->directory << std::endl;
     }
 
     Mesh processMesh(aiMesh* mesh, const aiScene* scene)
@@ -356,6 +357,7 @@ private:
         {
             aiString str;
             mat->GetTexture(type, i, &str);
+
             // Check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
             GLboolean skip = false;
             for (GLuint j = 0; j < textures_loaded.size(); j++)
@@ -370,6 +372,7 @@ private:
             if (!skip)
             {   // If texture hasn't been loaded already, load it
                 Texture texture;
+                printf("PAT: OK\n");
                 texture.setID(TextureFromFileDir(str.C_Str(), this->directory));
                 texture.setType(typeName);
                 texture.setPath(str);

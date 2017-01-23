@@ -17,8 +17,10 @@
 #include <string>
 #include <time.h>
 #include <map>
-#include <SOIL/SOIL.h>
+//#include <SOIL/SOIL.h>
 #include <GL/glew.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
 #define _ALLOCATION_FAILED_ 1
 #define _VECTOR_ILLEGAL_SIZE_ 2
@@ -176,15 +178,26 @@ protected:
 
         // Use SOIL library to save height map
         // See SOIL documentation to learn more about the function `SOIL_save_image`
-        GLint save_success = SOIL_save_image(ap_filename.c_str(),
+        /*GLint save_success = SOIL_save_image(ap_filename.c_str(),
                                              SOIL_SAVE_TYPE_BMP,
                                              width,
                                              height,
                                              1,
-                                             heightMapPixels);
+                                             heightMapPixels);*/
+        
+        // Create a SDL surface by computed pointer
+        SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(
+            heightMapPixels, width, height, 8,
+            width, 0, 0, 0, 0
+        );
+        surface = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_INDEX8, 0);
+        IMG_SavePNG(surface, ap_filename.c_str());
+        SDL_FreeSurface(surface);
+
         // Delete the height_map
         delete[] heightMapPixels;
-        return save_success;
+        //return save_success;
+        return 0;
     }
 
     /* PROTECTED MEMBER
