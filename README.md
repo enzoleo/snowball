@@ -13,8 +13,8 @@ This is a simple game developed by **OpenGL3.3**. You control a snowball and dri
 + [**ASSIMP**](https://github.com/assimp/assimp): Open Asset Import Library (assimp)
 > Official Open Asset Import Library Repository. Loads 40+ 3D file formats into one unified and clean data structure. [http://www.assimp.org](http://www.assimp.org) 
 
-+ [**SOIL**](https://github.com/epatel/SOIL): Simple OpenGL Image Library
-> Simple OpenGL Image Library [http://www.lonesock.net/soil.html](http://www.lonesock.net/soil.html)
++ [**SDL**](https://www.libsdl.org/): Simple DirectMedia Layer (**VERSION >= 2.0.0**)
+> Simple DirectMedia Layer is a cross-platform development library designed to provide low level access to audio, keyboard, mouse, joystick, and graphics hardware via OpenGL and Direct3D. [https://www.libsdl.org/](https://www.libsdl.org/)
 
 **OpenGL3.3**: *GLM*, *GLEW* and *GLFW* required.
 
