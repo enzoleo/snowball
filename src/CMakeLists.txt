@@ -14,18 +14,20 @@ add_executable(hello ${SRC_LIST})
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glfw3 REQUIRED)
-find_package(libSOIL REQUIRED)
+find_package(SDL2 REQUIRED)
+find_package(SDL2_image REQUIRED)
 
 # Include directories of dependicies
 include_directories(
     ${OPENGL_INCLUDE_DIRS}
     ${GLEW_INCLUDE_DIRS}
     ${glfw3_INCLUDE_DIRS}
-    ${libSOIL_INCLUDE_DIRS}
+    ${SDL2_INCLUDE_DIRS}
+    ${SDL2_image_INCLUDE_DIRS}
 )
 
 # Could not find the OpenGL and GLUT packages
-if (NOT OpenGL_FOUND OR NOT GLEW_FOUND OR NOT glfw3_FOUND OR NOT libSOIL_FOUND)
+if (NOT OpenGL_FOUND OR NOT GLEW_FOUND OR NOT glfw3_FOUND OR NOT SDL2_FOUND OR NOT SDL2_image_FOUND)
     message(FATAL_ERROR "Package not found!")
-endif(NOT OpenGL_FOUND OR NOT GLEW_FOUND OR NOT glfw3_FOUND OR NOT libSOIL_FOUND)
+endif(NOT OpenGL_FOUND OR NOT GLEW_FOUND OR NOT glfw3_FOUND OR NOT SDL2_FOUND OR NOT SDL2_image_FOUND)
 

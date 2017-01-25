@@ -767,9 +767,6 @@ int main()
         glfwSwapBuffers(window);
     }
 
-    PerlinNoiseGenerator pg;
-    pg.generate("ok.png");
-
     glfwTerminate();
     return 0;
 }

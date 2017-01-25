@@ -258,7 +258,6 @@ private:
         {
             this->processNode(node->mChildren[i], scene);
         }
-        std::cout << this->directory << std::endl;
     }
 
     Mesh processMesh(aiMesh* mesh, const aiScene* scene)
@@ -372,7 +371,6 @@ private:
             if (!skip)
             {   // If texture hasn't been loaded already, load it
                 Texture texture;
-                printf("PAT: OK\n");
                 texture.setID(TextureFromFileDir(str.C_Str(), this->directory));
                 texture.setType(typeName);
                 texture.setPath(str);

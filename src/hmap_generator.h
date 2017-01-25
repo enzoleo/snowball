@@ -17,7 +17,6 @@
 #include <string>
 #include <time.h>
 #include <map>
-//#include <SOIL/SOIL.h>
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -144,8 +143,8 @@ protected:
     /* FUNCTION: save height map
     ** DEFAULT directory: "../assets/terrains/"
     ** The height map will be saved into this directory */
-    GLint save(ImagePointer heightMapData,
-               const std::string& filename)
+    void save(ImagePointer heightMapData,
+              const std::string& filename)
     {
         // Get the absolute path of the height map file
         std::string ap_filename = heightMapPath + filename;
@@ -176,28 +175,27 @@ protected:
             exit(1);
         }
 
-        // Use SOIL library to save height map
-        // See SOIL documentation to learn more about the function `SOIL_save_image`
-        /*GLint save_success = SOIL_save_image(ap_filename.c_str(),
-                                             SOIL_SAVE_TYPE_BMP,
-                                             width,
-                                             height,
-                                             1,
-                                             heightMapPixels);*/
-        
-        // Create a SDL surface by computed pointer
+        // Create a SDL surface by computed pointer.
+        // Attention the depth is 8bits here, so the SDL function `SDL_CreateRGBSurfaceFrom`
+        // allocates an empty palette for the surface. We have to fill the palette by hand.
         SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(
             heightMapPixels, width, height, 8,
             width, 0, 0, 0, 0
         );
-        surface = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_INDEX8, 0);
-        IMG_SavePNG(surface, ap_filename.c_str());
+
+        // Initiate a new grayscale palette
+        // Learn more info here: https://wiki.libsdl.org/SDL_CreateRGBSurfaceFrom
+        SDL_Color colors[256];
+        for(int i = 0; i < 256; i++)
+            colors[i].r = colors[i].g = colors[i].b = i;
+        SDL_SetPaletteColors(surface->format->palette, colors, 0, 256);
+
+        // Save height map image
+        SDL_SaveBMP(surface, ap_filename.c_str());
         SDL_FreeSurface(surface);
 
         // Delete the height_map
         delete[] heightMapPixels;
-        //return save_success;
-        return 0;
     }
 
     /* PROTECTED MEMBER

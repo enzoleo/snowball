@@ -18,14 +18,11 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <SOIL/SOIL.h>
 
 #include "hmap_generator.h"
 #include "objects.h"
 
-#ifdef _TERRAIN_NORMAL_SAVE_
-#undef _TERRAIN_NORMAL_SAVE_
-#endif
+#define _TERRAIN_NORMAL_SAVE_
 #define _TERRAIN_HEIGHT_SMOOTH_
 
 /* STATIC FUNCTION
@@ -44,14 +41,14 @@ class Terrain : public Object
 public:
 
     /* Default constructor & constructor */
-    Terrain(const char* heightMapPixels,
+    Terrain(const char* heightMapPath,
             GLfloat _size = 100.0f,
             GLfloat _peak = 40.0f)
         : size(_size),
           peak(_peak)
     {
         //model = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
-        generate(heightMapPixels);
+        generate(heightMapPath);
     }
 
     /* Default destructor */
@@ -162,13 +159,13 @@ public:
         // Compute altitude!
         GLfloat altitude = (xCoord < zCoord) ?
             genAltitudeCoord(glm::vec3(0.0f, heights[hgrid][wgrid], 0.0f),
-                glm::vec3(1.0f, heights[hgrid + 1][wgrid + 1], 1.0f),
-                glm::vec3(0.0f, heights[hgrid + 1][wgrid], 1.0f),
-                xCoord, zCoord) :
+                             glm::vec3(1.0f, heights[hgrid + 1][wgrid + 1], 1.0f),
+                             glm::vec3(0.0f, heights[hgrid + 1][wgrid], 1.0f),
+                             xCoord, zCoord) :
             genAltitudeCoord(glm::vec3(0.0f, heights[hgrid][wgrid], 0.0f),
-                glm::vec3(1.0f, heights[hgrid][wgrid + 1], 0.0f),
-                glm::vec3(1.0f, heights[hgrid + 1][wgrid + 1], 1.0f),
-                xCoord, zCoord);
+                             glm::vec3(1.0f, heights[hgrid][wgrid + 1], 0.0f),
+                             glm::vec3(1.0f, heights[hgrid + 1][wgrid + 1], 1.0f),
+                             xCoord, zCoord);
 
         return altitude;
     }
@@ -177,32 +174,10 @@ private:
 
     /* PRIVATE MEMBER
     ** Generates all parameters needed. */
-    void generate(const char* heightMapPixels)
+    void generate(const char* heightMapPath)
     {
-        GLint width, height, channels;
-
-        // Use SOIL library to load image from file
-        // See SOIL documentation to learn more about the function `SOIL_load_image`
-        unsigned char* height_map = SOIL_load_image(heightMapPixels,
-                                                    &width,
-                                                    &height,
-                                                    &channels,
-                                                    SOIL_LOAD_L);
-        // SOIL failed to load height map from the given filaname
-        if (!height_map) fprintf(stderr, "ERROR: Fail to load image: %s\n", heightMapPixels);
-        else
-        { // Load successfully!
-            cells = width;
-            if (cells != height)
-            { // Height map must be a square
-                fprintf(stderr, "ERROR: Height map is not square: %s\n", heightMapPixels);
-            }
-            if (channels != 1)
-            { // The channel for a height map does not equal to 1
-                fprintf(stderr, "The number of channels is %d. \n", channels);
-                fprintf(stderr, "@param CHANNEL is supposed to be 1: %s\n", heightMapPixels);
-            }
-        }
+        // Load heightmap from file
+        SDL_Surface* surface = IMG_Load(heightMapPath);
 
         try
         { // Assignments
@@ -215,12 +190,12 @@ private:
         catch (const std::bad_alloc& err)
         { // Allocation failed (catch exception)
             fprintf(stderr, "Allocation failed.\n");
-            exit(1);
+            exit(_ALLOCATION_FAILED_);
         }
 
         // Rescale the heights read from height map
-        readHeightMapData(height_map);
-        delete[] height_map;
+        readHeightMapData(reinterpret_cast<unsigned char*>(surface->pixels));
+        SDL_FreeSurface(surface);
 
         // --------------------------------------------------------------------------------------
         // Compute vertices(positions), normals and texture coordinates
@@ -236,7 +211,7 @@ private:
         smoothingNormals();
 #endif
 #ifdef _TERRAIN_NORMAL_SAVE_
-        saveNormalMap("../assets/terrains/normal_map.bmp");
+        saveNormalMap("../assets/terrains/normal_map.png");
         printf("Normal Map Saved Successfully!\n");
 #endif
     }
@@ -290,7 +265,7 @@ private:
         { // Width traversal
             for (GLint wloop = 0; wloop < cells; wloop++)
             { // Height traversal
-                GLfloat height_data = peak * (GLfloat)data[hloop * cells + wloop] / 255;
+                GLfloat height_data = peak * (GLfloat)data[3 * (hloop * cells + wloop)] / 255;
                 heights[hloop][wloop] = data ? height_data : 0.0f;
             }
         }
@@ -391,19 +366,19 @@ private:
 
                 // Compute the new normal vector
                 GLfloat _add_height = _height_right + _height_left
-                    + _height_toprt + _height_btmlt
-                    + _height_top + _height_btm
-                    + _height_toplt + _height_btmrt;
+                                    + _height_toprt + _height_btmlt
+                                    + _height_top + _height_btm
+                                    + _height_toplt + _height_btmrt;
 
                 if (vertex_flag) // The pixel is one of the vertices
                     heights[hloop][wloop] = 0.75f * alpha * heights[hloop][wloop]
-                    + 0.25f * (1.0f - alpha) * _add_height;
+                                          + 0.25f * (1.0f - alpha) * _add_height;
                 else if (border_flag) // The pixel is on border but not a vertex
                     heights[hloop][wloop] = (5.0f / 6) * alpha * heights[hloop][wloop]
-                    + (1.0f / 6) * (1.0f - alpha) * _add_height;
+                                          + (1.0f / 6) * (1.0f - alpha) * _add_height;
                 else // The pixel is inside the height map
                     heights[hloop][wloop] = 0.875f * alpha * heights[hloop][wloop]
-                    + 0.125f * (1 - alpha) * _add_height;
+                                          + 0.125f * (1 - alpha) * _add_height;
             }
         }
     }
@@ -468,21 +443,25 @@ private:
         {
             for (GLint wloop = 0; wloop < cells; wloop++)
             {
-                normal_map[3 * (hloop * cells + wloop)] = (normals[hloop * cells + wloop].x) * 255;
+                normal_map[3 * (hloop * cells + wloop) + 2] = (normals[hloop * cells + wloop].x) * 255;
                 normal_map[3 * (hloop * cells + wloop) + 1] = (normals[hloop * cells + wloop].y) * 255;
-                normal_map[3 * (hloop * cells + wloop) + 2] = (normals[hloop * cells + wloop].z) * 255;
+                normal_map[3 * (hloop * cells + wloop)] = (normals[hloop * cells + wloop].z) * 255;
             }
         }
 
-        // Save the normal map data (BMP file)
-        GLint save_result = SOIL_save_image(filename.c_str(),
-                                            SOIL_SAVE_TYPE_BMP,
-                                            cells, cells, 3,
-                                            normal_map);
+        // Save the normal map data (PNG file)
+        SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(
+            normal_map, cells, cells, 24,
+            cells * 3, 0, 0, 0, 0
+        );
+
+        // Save height map image
+        IMG_SavePNG(surface, filename.c_str());
+        SDL_FreeSurface(surface);
 
         // Delete normal map temporary pointer
         delete[] normal_map;
-        return save_result;
+        return 0;
     }
 
     /* PRIVATE MEMBER
