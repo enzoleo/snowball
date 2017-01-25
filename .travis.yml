@@ -14,9 +14,8 @@ addons:
         packages:
             - cmake
 script:
-    - mkdir build
-    - cd build
-    - cmake ..
+    - cd src
+    - make
 notifications:
     email:
         recipients:
