@@ -27,11 +27,9 @@ install:
     - wget -O glfw-3.2.1.zip https://github.com/glfw/glfw/archive/3.2.1.zip
     - unzip glfw-3.2.1.zip
     - cd glfw-3.2.1
-    - mkdir build
-    - cd build
+    - mkdir build && cd build
     - cmake -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF -DCMAKE_INSTALL_PREFIX=/usr -DLIB_SUFFIX=/x86_64-linux-gnu ..
-    - make
-    - sudo make install
+    - make && sudo make install
     - cd ../..
     # GLM 0.9.8.4 install
     # Download source files from GitHub
@@ -39,11 +37,9 @@ install:
     - wget -O glm-0.9.8.4.zip https://github.com/g-truc/glm/releases/download/0.9.8.4/glm-0.9.8.4.zip
     - unzip glm-0.9.8.4.zip
     - cd glm
-    - mkdir build
-    - cd build
+    - mkdir build && cd build
     - cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DGLM_INSTALL_ENABLE=ON ..
-    - make
-    - sudo make install
+    - make && sudo make install
     - cd ../..
     # SDL2 (Version 2.0.5) install
     # Download source files from official site
@@ -51,8 +47,7 @@ install:
     - unzip SDL2-2.0.5.zip
     - cd SDL2-2.0.5
     - ./configure
-    - make
-    - sudo make install
+    - make && sudo make install
     - cd ..
     # SDL2_image (Version 2.0.1) install
     # Download source files from official site
@@ -60,8 +55,7 @@ install:
     - unzip SDL2_image-2.0.1.zip
     - cd SDL2_image-2.0.1
     - ./configure
-    - make
-    - sudo make install
+    - make && sudo make install
     - cd ..
     # ASSIMP (Version 3.3.1) install
     # Download source file from GitHub
@@ -71,8 +65,7 @@ install:
     - mkdir build
     - cd build
     - cmake ..
-    - make 
-    - sudo make install
+    - make && sudo make install
     - cd ../../..
 addons:
     apt:
