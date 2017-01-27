@@ -606,14 +606,12 @@ public:
             deque.push_back(safeLane);
         }
 
-        for (GLuint i = 0; i < 2 * rowSize; ++i) {
+        for (GLuint i = 0; i < (GLuint)(2 * rowSize); i++) 
             barrier_types.push_back(rand() % num_barrier_types);
-        }
 
         barrier_objs.reserve(num_barrier_types);
-        for (GLuint i = 0; i < num_barrier_types; ++i) {
+        for (GLuint i = 0; i < (GLuint)num_barrier_types; i++) 
             barrier_objs.push_back(0);
-        }
         
         GLfloat barrierLoop = -spacing;
         barrierDeque::iterator iter = deque.begin();

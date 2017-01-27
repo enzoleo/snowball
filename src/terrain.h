@@ -55,7 +55,7 @@ public:
     ~Terrain()
     {
         // Delete height data pointer
-        for (GLint _row = 0; _row < cells; _row++) delete heights[_row];
+        for (GLuint _row = 0; _row < cells; _row++) delete heights[_row];
         delete[] heights;
     }
 
@@ -142,8 +142,8 @@ public:
         GLfloat cell_size = size / ((GLfloat)cells - 1);
 
         // Calculate grid position
-        GLint hgrid = (GLint)(zterrain / cell_size);
-        GLint wgrid = (GLint)(xterrain / cell_size);
+        GLuint hgrid = (GLuint)(zterrain / cell_size);
+        GLuint wgrid = (GLuint)(xterrain / cell_size);
         if (hgrid < 0 || hgrid >= cells - 1 ||
             wgrid < 0 || wgrid >= cells - 1)
         { // Wrong position
@@ -182,7 +182,7 @@ private:
         try
         { // Assignments
             heights = new GLfloat*[cells];
-            for (int hloop = 0; hloop < cells; hloop++)
+            for (GLuint hloop = 0; hloop < cells; hloop++)
             { // New pointer space
                 heights[hloop] = new GLfloat[cells];
             }
@@ -222,9 +222,9 @@ private:
     ** If you are certain this function is needed, define macro _TERRAIN_NORMAL_SMOOTH_. */
     void smoothingNormals()
     {
-        for (GLint hloop = 0; hloop < cells; hloop++)
+        for (GLuint hloop = 0; hloop < cells; hloop++)
         { // Traversal -> all pixels
-            for (GLint wloop = 0; wloop < cells; wloop++)
+            for (GLuint wloop = 0; wloop < cells; wloop++)
             {
                 // Get location of 8 pixels around
                 GLint _cur_cell = hloop * cells + wloop;
@@ -261,9 +261,9 @@ private:
     ** The function to calculate heights data from image */
     void readHeightMapData(unsigned char* data)
     {
-        for (GLint hloop = 0; hloop < cells; hloop++)
+        for (GLuint hloop = 0; hloop < cells; hloop++)
         { // Width traversal
-            for (GLint wloop = 0; wloop < cells; wloop++)
+            for (GLuint wloop = 0; wloop < cells; wloop++)
             { // Height traversal
                 GLfloat height_data = peak * (GLfloat)data[3 * (hloop * cells + wloop)] / 255;
                 heights[hloop][wloop] = data ? height_data : 0.0f;
@@ -286,9 +286,9 @@ private:
 
         // The left-bottom corner of the terrain square
         glm::vec2 position(0.0f, 0.0f);
-        for (GLint hloop = 0; hloop < cells; hloop++)
+        for (GLuint hloop = 0; hloop < cells; hloop++)
         { // Traversal -> all pixels
-            for (GLint wloop = 0; wloop < cells; wloop++)
+            for (GLuint wloop = 0; wloop < cells; wloop++)
             {
                 // Compute vertices, uv and normals
                 glm::vec3 vertex(position.x, heights[hloop][wloop], position.y);
@@ -328,9 +328,9 @@ private:
     **     is, the smoother our terrain will be. */
     void smoothing(GLfloat alpha)
     {
-        for (GLint hloop = 0; hloop < cells; hloop++)
+        for (GLuint hloop = 0; hloop < cells; hloop++)
         { // Traversal -> all pixels
-            for (GLint wloop = 0; wloop < cells; wloop++)
+            for (GLuint wloop = 0; wloop < cells; wloop++)
             { // Determine whether the pixel is on border
                 GLboolean border_flag = false;
                 GLboolean vertex_flag = false;
@@ -385,7 +385,7 @@ private:
 
     /* PRIVATE MEMBER
     ** Computes the normal vectors with given vertex position */
-    glm::vec3 computeNormals(GLint hpos, GLint wpos)
+    glm::vec3 computeNormals(GLuint hpos, GLuint wpos)
     {
         // Get the size of each cell
         GLfloat cell_size = size / ((GLfloat)cells - 1);
@@ -439,9 +439,9 @@ private:
 
         // Normal vector -> RGB value
         unsigned char* normal_map = new unsigned char[cells * cells * 3];
-        for (GLint hloop = 0; hloop < cells; hloop++)
+        for (GLuint hloop = 0; hloop < cells; hloop++)
         {
-            for (GLint wloop = 0; wloop < cells; wloop++)
+            for (GLuint wloop = 0; wloop < cells; wloop++)
             {
                 normal_map[3 * (hloop * cells + wloop) + 2] = (normals[hloop * cells + wloop].x) * 255;
                 normal_map[3 * (hloop * cells + wloop) + 1] = (normals[hloop * cells + wloop].y) * 255;
@@ -466,7 +466,7 @@ private:
 
     /* PRIVATE MEMBER
     ** The number of cells on each edge (the same in each edge) */
-    GLint cells;
+    GLuint cells;
 
     /* PRIVATE MEMBER
     ** @param vertices: The vector of vertices

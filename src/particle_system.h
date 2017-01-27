@@ -89,10 +89,6 @@ public:
     glm::vec3 position;
 
     /* PUBLIC MEMBER
-    ** remaining life of the particle. if < 0 : dead and unused. */
-    GLfloat life;
-
-    /* PUBLIC MEMBER
     ** The velocity of particle */
     glm::vec3 velocity;
 
@@ -103,6 +99,10 @@ public:
     **     to render the snowflake scene like a real natural phenomenon. */
     const glm::vec3 gravity;
     glm::vec3 drag;
+
+    /* PUBLIC MEMBER
+    ** remaining life of the particle. if < 0 : dead and unused. */
+    GLfloat life;
 };
 
 /* CLASS: Particle system */
@@ -119,13 +119,13 @@ public:
                    GLfloat _range_z,
                    GLfloat _drag_coef = 200.0f,
                    GLfloat _size = 0.2f)
-        : shader(_shader),
+        : ParticleBase(_drag_coef, _size),
+          shader(_shader),
           texture(_texture),
           generate_speed(_generate_speed),
           position_generator(_position_generator),
           range_x(_range_x),
-          range_z(_range_z),
-          ParticleBase(_drag_coef, _size)
+          range_z(_range_z)
     { // Do initialization
         init();
     }
@@ -328,6 +328,14 @@ private:
     }
 
     /* PRIVATE MEMBER
+    ** A specific shader for rendering particles */
+    Shader shader;
+
+    /* PRIVATE MEMBER
+    ** The texture we use to attach to each particle */
+    Texture texture;
+
+    /* PRIVATE MEMBER
     ** The vector records all particles */
     std::vector<Particle> particles;
 
@@ -348,14 +356,6 @@ private:
     /* PRIVATE MEMBERS
     ** The range within which we respawn particles */
     GLfloat range_x, range_z;
-
-    /* PRIVATE MEMBER
-    ** A specific shader for rendering particles */
-    Shader shader;
-
-    /* PRIVATE MEMBER
-    ** The texture we use to attach to each particle */
-    Texture texture;
 
     /* PRIVATE MEMBERS
     ** The VAO and VBOs of the particle system */

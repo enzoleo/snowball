@@ -89,7 +89,7 @@ glm::vec3 lightDir;
 // Game related
 Barriers barriers;
 
-int score = 0;
+GLuint score = 0;
 
 bool barriersUp = false;
 

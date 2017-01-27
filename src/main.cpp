@@ -56,10 +56,10 @@ void screenshot()
     //     For an image, the double-loop below may cost plenty of time. Thus
     //     remember to use it carefully.
     // ----------------------------------------------------------------------
-    for (int y = 0; y < window_height / 2; y++)
+    for (GLuint y = 0; y < window_height / 2; y++)
     {
         const int swapY = window_height - y - 1;
-        for (int x = 0; x < window_width; x++)
+        for (GLuint x = 0; x < window_width; x++)
         {
             const int offset = 4 * (x + y * window_width);
             const int swapOffset = 4 * (x + swapY * window_width);
@@ -205,7 +205,7 @@ void initScene()
     {
         grassModelMatsA.reserve(num_grass);
         grassModelMatsB.reserve(num_grass);
-        for (GLint i = 0; i < num_grass / 2; i++)
+        for (GLuint i = 0; i < num_grass / 2; i++)
         {
             int temp = -10 * i;
             glm::mat4 model;
@@ -219,7 +219,7 @@ void initScene()
 
         treeModelMatsA.reserve(num_tree);
         treeModelMatsB.reserve(num_tree);
-        for (GLint i = 0; i < num_tree / 2; i++)
+        for (GLuint i = 0; i < num_tree / 2; i++)
         {
             int temp = -50 * i;
             glm::mat4 model;
@@ -411,14 +411,14 @@ void updateScene()
         {
             if (drawPlantA)
             {
-                for (int i = 0; i < num_grass; ++i)
+                for (GLuint i = 0; i < num_grass; ++i)
                     grassModelMatsA[i] = temp * grassModelMatsA[i];
-                for (int i = 0; i < num_tree; ++i)
+                for (GLuint i = 0; i < num_tree; ++i)
                     treeModelMatsA[i] = temp * treeModelMatsA[i];
             }
             if (drawTerrainA)
             {
-                for (int i = 0; i < num_terrain; ++i)
+                for (GLuint i = 0; i < num_terrain; ++i)
                     terrainModelMatsA[i] = temp * terrainModelMatsA[i];
             }
             
@@ -429,14 +429,14 @@ void updateScene()
         {
             if (drawPlantB)
             {
-                for (int i = 0; i < num_grass; ++i)
+                for (GLuint i = 0; i < num_grass; ++i)
                     grassModelMatsB[i] = temp * grassModelMatsB[i];
-                for (int i = 0; i < num_tree; ++i)
+                for (GLuint i = 0; i < num_tree; ++i)
                     treeModelMatsB[i] = temp * treeModelMatsB[i];
             }
             if (drawTerrainB)
             {
-                for (int i = 0; i < num_terrain; ++i)
+                for (GLuint i = 0; i < num_terrain; ++i)
                     terrainModelMatsB[i] = temp * terrainModelMatsB[i];
             }
             
@@ -577,7 +577,6 @@ void updateScene()
     }
 
     // Get baseline and rotation angle of barriers
-    GLfloat baseline = barriers.getBaseline();
     GLfloat rotSpeed = barriers.getRotSpeed();
 
     // Increase rotation angle
@@ -612,18 +611,18 @@ void renderScene(Shader shader)
     // render scene A
     {
         if (drawPlantA) {
-            for (int i = 0; i < num_grass; ++i) {
+            for (GLuint i = 0; i < num_grass; ++i) {
                 grass.setModelMatrix(grassModelMatsA[i]);
                 grass.draw(shader);
             }
 
-            for (int i = 0; i < num_tree; ++i) {
+            for (GLuint i = 0; i < num_tree; ++i) {
                 tree.setModelMatrix(treeModelMatsA[i]);
                 tree.draw(shader);
             }
         }
         if (drawTerrainA) {
-            for (int i = 0; i < num_terrain; ++i) {
+            for (GLuint i = 0; i < num_terrain; ++i) {
                 mini_terrain.setModelMatrix(terrainModelMatsA[i]);
                 mini_terrain.draw(shader);
             }
@@ -637,18 +636,18 @@ void renderScene(Shader shader)
     // render scene B
     {
         if (drawPlantB) {
-            for (int i = 0; i < num_grass; ++i) {
+            for (GLuint i = 0; i < num_grass; ++i) {
                 grass.setModelMatrix(grassModelMatsB[i]);
                 grass.draw(shader);
             }
 
-            for (int i = 0; i < num_tree; ++i) {
+            for (GLuint i = 0; i < num_tree; ++i) {
                 tree.setModelMatrix(treeModelMatsB[i]);
                 tree.draw(shader);
             }
         }
         if (drawTerrainB) {
-            for (int i = 0; i < num_terrain; ++i) {
+            for (GLuint i = 0; i < num_terrain; ++i) {
                 mini_terrain.setModelMatrix(terrainModelMatsB[i]);
                 mini_terrain.draw(shader);
             }
@@ -717,7 +716,6 @@ int main()
         GLfloat currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-        num_frames++;
         GLfloat dt = currentFrame - lastTime;
 
         // Check and call events
@@ -734,7 +732,7 @@ int main()
 
         game_process_flag = camera.move(
             glm::vec3(0.0f, 5.0f, camera_start_pos),
-            -90.0f, 0.0f, 0.1f, 0.1f, dt);
+            -90.0f, 0.0f, 3.0f, 3.0f, deltaTime);
 
         // This line must be here! Or the screen will flash!
         glfwSwapBuffers(window);
@@ -746,7 +744,6 @@ int main()
         GLfloat currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-        num_frames++;
         GLfloat dt = currentFrame - lastTime;
 
         // Check and call events

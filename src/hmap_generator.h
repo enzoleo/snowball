@@ -107,9 +107,9 @@ public:
                            GLuint _width = 256,
                            GLuint _height = 256)
         : heightMapPath(_heightMapPath),
+          algorithm(NONE_ALGORITHM),
           width(_width),
-          height(_height),
-          algorithm(NONE_ALGORITHM)
+          height(_height)
     { // Do nothing here
     }
 
@@ -161,9 +161,9 @@ protected:
         try
         { // Initialization (assignment)!
             heightMapPixels = new unsigned char[width * height];
-            for (GLint hloop = 0; hloop < height; hloop++)
+            for (GLuint hloop = 0; hloop < height; hloop++)
             {
-                for (GLint wloop = 0; wloop < width; wloop++)
+                for (GLuint wloop = 0; wloop < width; wloop++)
                 { // Convert the data into unsigned char datatype
                     heightMapPixels[hloop * width + wloop] = (unsigned char)(heightMapData[hloop][wloop] * 255);
                 }
@@ -316,7 +316,7 @@ public:
         // Set seed for random number generator
         srand(time(0));
         // Record the iterations algorithm has done
-        GLint iter_done = 0;
+        GLuint iter_done = 0;
         // The height data of the height map
         GLfloat** heightMapData;
 
@@ -342,7 +342,7 @@ public:
 
         // Parameter @manValue records the maximum or minimum height
         GLfloat maxValue = 0.0f;
-        for (GLint iter = 0; iter < iterations; iter++)
+        for (GLuint iter = 0; iter < iterations; iter++)
         {
             // Get the center coordinates of circle randomly
             GLfloat z = ((GLfloat)rand() / RAND_MAX) * width;
@@ -365,9 +365,9 @@ public:
             GLboolean strike_direction_flag = false;
             if (rand_num > 0.5f) strike_direction_flag = true;
 
-            for (GLint hloop = 0; hloop < height; hloop++)
+            for (GLuint hloop = 0; hloop < height; hloop++)
             {
-                for (GLint wloop = 0; wloop < width; wloop++)
+                for (GLuint wloop = 0; wloop < width; wloop++)
                 {
                     // Declare distance variables
                     GLfloat dist_ratio = 0.0f;
@@ -397,9 +397,9 @@ public:
 
         // This step is quite important!
         // We can only store data in [0, 1) into an image
-        for (GLint hloop = 0; hloop < height; hloop++)
+        for (GLuint hloop = 0; hloop < height; hloop++)
         {
-            for (GLint wloop = 0; wloop < width; wloop++)
+            for (GLuint wloop = 0; wloop < width; wloop++)
             {
                 heightMapData[hloop][wloop] /= maxValue;
             }
@@ -568,9 +568,9 @@ public:
             GLboolean end_flag = false;
             if (noise_ptr == smoothNoises + 1) end_flag = true;
 
-            for (GLint hloop = 0; hloop < height; hloop++)
+            for (GLuint hloop = 0; hloop < height; hloop++)
             { // Do traversal for each pixel
-                for (GLint wloop = 0; wloop < width; wloop++)
+                for (GLuint wloop = 0; wloop < width; wloop++)
                 {
                     perlinNoise[hloop][wloop] += (*(noise_ptr - 1))[hloop][wloop] * amplitude;
                     // Average the perlin noise data
@@ -647,7 +647,7 @@ protected:
         try
         { // Initialization (assignment)!
             smoothNoise = new GLfloat*[width];
-            for (GLint hloop = 0; hloop < height; hloop++)
+            for (GLuint hloop = 0; hloop < height; hloop++)
             {
                 smoothNoise[hloop] = new GLfloat[height];
 
@@ -670,7 +670,7 @@ protected:
 
                 // Do interpolation and assignment
                 GLfloat horizontal_blend = (hloop - cur_wperiod) * frequency;
-                for (GLint wloop = 0; wloop < width; wloop++)
+                for (GLuint wloop = 0; wloop < width; wloop++)
                 {
                     GLint cur_hperiod = (wloop / period) * period;
                     GLint next_hperiod = (cur_hperiod + period) % height;

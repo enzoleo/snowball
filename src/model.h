@@ -202,9 +202,8 @@ public:
         tex.setType(type);
         tex.setPath(aiString(path.c_str()));
         textures_loaded.push_back(tex);  //needed?
-        for (int i = 0; i < meshes.size(); ++i) {
+        for (GLuint i = 0; i < meshes.size(); ++i)
             meshes[i].textures.push_back(tex);
-        }
     }
 
     void load_from_file(const std::string& path) 

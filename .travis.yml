@@ -1,12 +1,50 @@
 language: cpp
-sudo: false
+sudo: required
+dist: trusty
 branches:
     only:
         - master
 compiler:
     - g++
 os:
+    # Only test CI in linux
     - linux
+before_install:
+    # Notice that the GLFW requires a working X11 display and makefont uses GLFW.
+    - "export DISPLAY=:99.0"
+    - "sh -e /etc/init.d/xvfb start"
+install:
+    # Update system here
+    - sudo apt-get update -qq
+    # Install dependencies libraries (cmake, g++ compiler, glew and X11 libraries)
+    - sudo apt-get install -qq cmake g++-5.4 gcc-5.4 libglew-dev libxmu-dev libxi-dev libxrandr-dev libxinerama-dev libxcursor-dev
+    # Prepare manual installation of dependencies
+    # Download and build other required dependencies here (just temporary)
+    - mkdir TRAVIS_TMP/ && cd TRAVIS_TMP
+    # GLFW 3.2.1 install
+    # Download source files from GitHub and compile them by CMake
+    - wget -O glfw-3.2.1.zip https://github.com/glfw/glfw/archive/3.2.1.zip
+    - unzip glfw-3.2.1.zip
+    - cd glfw-3.2.1
+    - mkdir build
+    - cd build
+    - cmake -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF -DCMAKE_INSTALL_PREFIX=/usr -DLIB_SUFFIX=/x86_64-linux-gnu ..
+    - make
+    - sudo make install
+    - cd ../..
+    # GLM 0.9.8.4 install
+    # Download source files from GitHub
+    # Notice that merely include the GLM headers is allowed
+    - wget https://github.com/g-truc/glm/releases/download/0.9.8.4/glm-0.9.8.4.zip
+    - unzip glm-0.9.8.4.zip
+    - cd glm-0.9.8.4
+    - mkdir build
+    - cd build
+    - cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DGLM_INSTALL_ENABLE=ON ..
+    - make
+    - sudo make install
+    - cd ../..
+
 addons:
     apt:
         sources:
@@ -14,7 +52,9 @@ addons:
         packages:
             - cmake
 script:
-    - cd src
+    - mkdir build
+    - cd build
+    - cmake ..
     - make
 notifications:
     email:
