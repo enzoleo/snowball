@@ -1,9 +1,10 @@
 # SnowballRun
 [![Build Status](https://travis-ci.org/perryleo/SnowballRun.png?branch=master)](https://travis-ci.org/perryleo/SnowballRun)
+![License](https://img.shields.io/aur/license/yaourt.svg)
 
 ### *Movement*
 
-***Final project of Computer Graphics***. *We are supposed to preview the basic concepts in graphics and do coding practice. Always welcome constructive criticism and suggestions!*
+***Final project of Computer Graphics***. *We are supposed to review the basic concepts in graphics and do coding practice. Always welcome constructive criticism and suggestions!*
 
 
 ## Brief introduction
@@ -31,4 +32,3 @@ This is a simple game developed by **OpenGL3.3**. You control a snowball and dri
 
 ## Download
 `Linux` and `Windows` platforms are tested. [Download](https://codeload.github.com/perryleo/FinalProject/zip/master) the source files and compile (make sure the **dependencies** mentioned above have been built).
-
