@@ -16,11 +16,12 @@ before_install:
 install:
     # Update system here
     - sudo apt-get update -qq
-    # Install dependencies libraries (cmake, g++ compiler, glew and X11 libraries)
-    - sudo apt-get install build-essential g++-4.9 gcc-4.9 libglew-dev libxmu-dev libxi-dev libxrandr-dev libxinerama-dev libxcursor-dev
+    # Install dependencies libraries (cmake, g++ compiler, glew, X11 and boost libraries)
+    # Notice that BOOST library is needed for ASSIMP
+    - sudo apt-get install build-essential g++-4.8 gcc-4.8 libglew-dev libxmu-dev libxi-dev libxrandr-dev libxinerama-dev libxcursor-dev libboost-all-dev
     # Prepare manual installation of dependencies
     # Download and build other required dependencies here (just temporary)
-    - mkdir TRAVIS_TMP/ && cd TRAVIS_TMP
+    - mkdir travis_tmp/ && cd travis_tmp
     # GLFW 3.2.1 install
     # Download source files from GitHub and compile them by CMake
     - wget -O glfw-3.2.1.zip https://github.com/glfw/glfw/archive/3.2.1.zip
@@ -35,16 +36,44 @@ install:
     # GLM 0.9.8.4 install
     # Download source files from GitHub
     # Notice that merely include the GLM headers is allowed
-    - wget https://github.com/g-truc/glm/releases/download/0.9.8.4/glm-0.9.8.4.zip
+    - wget -O glm-0.9.8.4.zip https://github.com/g-truc/glm/releases/download/0.9.8.4/glm-0.9.8.4.zip
     - unzip glm-0.9.8.4.zip
-    - cd glm-0.9.8.4
+    - cd glm
     - mkdir build
     - cd build
     - cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DGLM_INSTALL_ENABLE=ON ..
     - make
     - sudo make install
     - cd ../..
-
+    # SDL2 (Version 2.0.5) install
+    # Download source files from official site
+    - wget -O SDL2-2.0.5.zip https://www.libsdl.org/release/SDL2-2.0.5.zip
+    - unzip SDL2-2.0.5.zip
+    - cd SDL2-2.0.5
+    - ./configure
+    - make
+    - sudo make install
+    - cd ..
+    # SDL2_image (Version 2.0.1) install
+    # Download source files from official site
+    - wget -O SDL2_image-2.0.1.zip https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.0.1.zip
+    - unzip SDL2_image-2.0.1.zip
+    - cd SDL2_image-2.0.1
+    - ./configure
+    - make
+    - sudo make install
+    - cd ..
+    # ASSIMP (Version 3.3.1) install
+    # Download source file from GitHub
+    - wget -O assimp-3.3.1.zip https://codeload.github.com/assimp/assimp/zip/v3.3.1
+    - unzip assimp-3.3.1.zip
+    - cd assimp-3.3.1
+    - mkdir build
+    - cd build
+    - cmake ..
+    - make 
+    - sudo make install
+    - cd ../../..
 addons:
     apt:
         sources:
