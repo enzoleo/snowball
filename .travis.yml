@@ -1,3 +1,9 @@
+# -----------------------------------------------------------------------------
+# SnowballRun: Simple OpenGL game
+# TRAVIS CI file. (This project is tested on LINUX platform)
+# Distributed under the GPL-3.0 License.
+# See file `LICENSE` for more details.
+#------------------------------------------------------------------------------
 language: cpp
 sudo: required
 dist: trusty

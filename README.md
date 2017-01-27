@@ -31,4 +31,29 @@ This is a simple game developed by **OpenGL3.3**. You control a snowball and dri
 > GLFW is an Open Source, multi-platform library for OpenGL, OpenGL ES and Vulkan application development. It provides a simple, platform-independent API for creating windows, contexts and surfaces, reading input, handling events, etc. [http://www.glfw.org/](http://www.glfw.org/)
 
 ## Download
-`Linux` and `Windows` platforms are tested. [Download](https://codeload.github.com/perryleo/FinalProject/zip/master) the source files and compile (make sure the **dependencies** mentioned above have been built).
+This project is tested on `Linux` and `Windows` platforms. [Download](https://codeload.github.com/perryleo/FinalProject/zip/master) the source files and compile them manually (make sure the **dependencies** mentioned above have been built). CMake is strongly recommended for you! See the official site of [CMake](https://cmake.org) to learn more details. 
+
++ [**CMake**](https://cmake.org): An open-source, cross-platform family of tools designed to build, test and package software. 
+> CMake is used to control the software compilation process using simple platform and compiler independent configuration files, and generate native makefiles and workspaces that can be used in the compiler environment of your choice. [https://cmake.org](https://cmake.org)
+
+[Download](https://cmake.org/download/) **CMake** (choose the suitable version from the official site) and install it. Then use your CMake to compile source files. The executables will be generated into the `bin/` directory.
+
+### Linux
+Open the home directory of this poject in terminal. Create a new directory named `build/` and build CMake files in this directory. Below is an example of how the game can be compiled on Linux.
+
+```
+mkdir build
+cd build
+cmake ..
+make
+````
+
+### Windows
+On Windows the compiling steps are similar. Remember to install all dependencies required before compiling. See **Dependencies** above to learn more details, for tshe installation of dependencies may be different from that in Linux.
+
+```
+mkdir build
+cd build
+cmake ..
+nmake
+````
