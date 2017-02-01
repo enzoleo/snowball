@@ -1,5 +1,5 @@
 # SnowballRun
-[![Build Status](https://travis-ci.org/perryleo/SnowballRun.png?branch=master)](https://travis-ci.org/perryleo/SnowballRun)
+[![Build Status](https://travis-ci.org/perryleo/SnowballRun.svg?branch=master)](https://travis-ci.org/perryleo/SnowballRun)
 ![License](https://img.shields.io/aur/license/yaourt.svg)
 
 ### *Movement*
