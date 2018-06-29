@@ -2,9 +2,9 @@
 [![Build Status](https://travis-ci.org/perryleo/SnowballRun.svg?branch=master)](https://travis-ci.org/perryleo/SnowballRun)
 ![License](https://img.shields.io/aur/license/yaourt.svg)
 
-### *Movement*
+### *Maintenance*
 
-***Final project of Computer Graphics***. *We are supposed to review the basic concepts in graphics and do coding practice. Always welcome constructive criticism and suggestions!*
+*Maintenance stopped.*
 
 
 ## Brief introduction
@@ -47,14 +47,3 @@ cd build
 cmake ..
 make
 ````
-
-### Windows
-On Windows the compiling steps are similar. Remember to install all dependencies required before compiling. See **Dependencies** above to learn more details, for tshe installation of dependencies may be different from that in Linux.
-
-```
-mkdir build
-cd build
-cmake ..
-nmake
-````
-
