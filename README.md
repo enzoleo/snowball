@@ -2,9 +2,9 @@
 [![Build Status](https://travis-ci.org/enzoleo/SnowballRun.svg?branch=master)](https://travis-ci.org/perryleo/SnowballRun)
 ![License](https://img.shields.io/aur/license/yaourt.svg)
 
-### *Maintenance*
+### *Archive*
 
-*Maintenance stopped.*
+*This repository is archived now.*
 
 
 ## Brief introduction

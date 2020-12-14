@@ -6,7 +6,7 @@
 #------------------------------------------------------------------------------
 language: cpp
 sudo: required
-dist: trusty
+dist: focal
 branches:
     only:
         - master
@@ -24,7 +24,7 @@ install:
     - sudo apt-get update -qq
     # Install dependencies libraries (cmake, g++ compiler, glew, X11 and boost libraries)
     # Notice that BOOST library is needed for ASSIMP
-    - sudo apt-get install build-essential g++-4.8 gcc-4.8 libglew-dev libxmu-dev libxi-dev libxrandr-dev libxinerama-dev libxcursor-dev libboost-all-dev
+    - sudo apt-get install build-essential libglew-dev libxmu-dev libxi-dev libxrandr-dev libxinerama-dev libxcursor-dev libboost-all-dev
     # Prepare manual installation of dependencies
     # Download and build other required dependencies here (just temporary)
     - mkdir travis_tmp/ && cd travis_tmp
