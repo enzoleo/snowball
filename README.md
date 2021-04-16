@@ -1,11 +1,9 @@
-# SnowballRun
-[![Build Status](https://travis-ci.org/enzoleo/SnowballRun.svg?branch=master)](https://travis-ci.org/perryleo/SnowballRun)
-![License](https://img.shields.io/aur/license/yaourt.svg)
-
+# snowball
+[![Build Status](https://travis-ci.org/enzoleo/SnowballRun.svg?branch=master)](https://travis-ci.com/enzoleo/snowball.svg)
+[![License](https://img.shields.io/github/license/enzoleo/SnowballRun.svg)](https://raw.githubusercontent.com/enzoleo/snowball/master/LICENSE)
 ### *Archive*
 
 *This repository is archived now.*
-
 
 ## Brief introduction
 This is a simple game developed by **OpenGL3.3**. You control a snowball and drive it home, which means, you need to elude barriers to avoid dying and accumulate other snowballs to prolong your life. The snowball is always being melting! In other words, the radius of your snowball, which represents your life level, is always being decreasing. Merely elude barriers, or you will be dead immediately, and do not forget to accumulate snowballs at the same time. When seeing a house, you win the game.
