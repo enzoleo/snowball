@@ -1,5 +1,5 @@
 # snowball
-[![Build Status](https://travis-ci.com/enzoleo/snowball.svg)](https://travis-ci.com/enzoleo/snowball.svg)
+[![Build Status](https://api.travis-ci.com/enzoleo/snowball.svg)](https://api.travis-ci.com/enzoleo/snowball.svg)
 [![License](https://img.shields.io/github/license/enzoleo/SnowballRun.svg)](https://raw.githubusercontent.com/enzoleo/snowball/master/LICENSE)
 ### *Archive*
 
