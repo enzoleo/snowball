@@ -577,7 +577,7 @@ class Barriers {
   void init() {
     // If the queue size not equals zero
     if (deque.size()) {  // EXIT program here!
-      printf("INIT ERROR: The barrier queue exists! Exit.\n");
+      std::print("INIT ERROR: The barrier queue exists! Exit.\n");
       exit(0);
     }
 
@@ -622,7 +622,7 @@ class Barriers {
   void initDeque(int* array) {
     // If the queue size not equals zero
     if (deque.size()) {  // EXIT program here!
-      printf("INIT ERROR: The barrier queue exists! Exit.\n");
+      std::print("INIT ERROR: The barrier queue exists! Exit.\n");
       exit(0);
     }
 
@@ -670,8 +670,8 @@ class Barriers {
     // Initialize iterator
     iterator iter = deque.begin();
     for (; iter != deque.end(); iter++)
-      printf("%d ", *iter);
-    printf("\n");
+      std::print("{} ", *iter);
+    std::print("\n");
   }
 
   void draw(Shader shader) {

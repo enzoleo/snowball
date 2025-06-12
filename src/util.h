@@ -1,7 +1,8 @@
 #pragma once
 #include <GL/glew.h>
-#include "objects.h"
+
 #include "light.hpp"
+#include "objects.h"
 #include "terrain.h"
 
 /* forward declaration */
@@ -28,17 +29,14 @@ Shader win_shader;
 Camera camera(
     glm::vec3(0.0f, 15.0f, 25.0f),
     glm::vec3(0.0f, 1.0f, 0.0f),
-    -90.0f, 37.0f
-);
+    -90.0f, 37.0f);
 
-
-// Key, mouse callbacks related 
+// Key, mouse callbacks related
 bool keys[1024];
 GLfloat lastX = window_width * 0.5, lastY = window_height * 0.5;
 bool firstMouse = true;
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
-
 
 // For calculating ms/frame, fps
 int num_frames = 0;
@@ -46,7 +44,6 @@ GLfloat lastTime = 0.0f;
 GLboolean bGameOver = false;
 GLboolean bWin = false;
 GLboolean game_process_flag = false;
-
 
 // Textures
 Texture texture_grass;
@@ -85,7 +82,6 @@ Light light0;
 glm::vec3 lightPos;
 glm::vec3 lightDir;
 
-
 // Game related
 Barriers barriers;
 
@@ -103,22 +99,18 @@ bool update_deque_processing_flag = false;
 GLfloat speed = 0.001f;
 GLfloat currentX, currentY, currentZ;
 
-// For moving the generator's position 
-GLfloat offset_z = 0;  
-
+// For moving the generator's position
+GLfloat offset_z = 0;
 
 // Terrains
 Terrain mini_terrain("../assets/terrains/test.bmp");
 
-
 // Particle system
-ParticleSystem *ps;
-
+ParticleSystem* ps;
 
 // Shadow Map
-ShadowMap *sm;
+ShadowMap* sm;
 const GLuint shadow_map_width = 1024, shadow_map_height = 1024;
-
 
 // Billboard
 Billboard* billboard;
@@ -128,11 +120,9 @@ Billboard* winning;
 // Screenshot
 int num_screenshots = 0;
 
-
-// For texture changing, see main.frag 
-//GLfloat pastTime = 0.0f;
+// For texture changing, see main.frag
+// GLfloat pastTime = 0.0f;
 GLfloat factor = 0.0f;
-
 
 // For changing scenes and stages
 GLfloat dist_total = 0.0f;
@@ -140,8 +130,8 @@ GLfloat dist_delta = 0.0f;  // dist_delta < 100
 
 // For transforming models like grass, trees, etc.
 GLuint num_grass = 20;
-std::vector<glm::mat4> grassModelMatsA;  //transformation matrices for part A
-std::vector<glm::mat4> grassModelMatsB;  //transformation matrices for part B
+std::vector<glm::mat4> grassModelMatsA;  // transformation matrices for part A
+std::vector<glm::mat4> grassModelMatsB;  // transformation matrices for part B
 
 GLuint num_tree = 4;
 std::vector<glm::mat4> treeModelMatsA;
@@ -156,7 +146,6 @@ Texture* pathTexB;
 GLuint num_terrain = 2;
 std::vector<glm::mat4> terrainModelMatsA;
 std::vector<glm::mat4> terrainModelMatsB;
-
 
 bool updateA = true;
 

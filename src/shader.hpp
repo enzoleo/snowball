@@ -19,6 +19,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+#include <print>
 #include <sstream>
 #include <string>
 
@@ -116,7 +117,7 @@ class Shader {
       install_flag = false;
     }  // Else print a WARNING to console
     else
-      printf("WARNING: No shader INSTALLED!\n");
+      std::print("WARNING: No shader INSTALLED!\n");
   }
 
   /* Returns the private members
@@ -192,7 +193,7 @@ class Shader {
       shader_file.close();
       shader_code = shader_stream.str();
     } catch (const std::ifstream::failure& err) {  // Vertex or fragment shader file opening error
-      fprintf(stderr, "ERROR: Cannot open shader file!\n");
+      std::print(stderr, "ERROR: Cannot open shader file!\n");
       exit(1);
     }
 
@@ -223,14 +224,14 @@ class Shader {
       glGetShaderiv(shader_program, GL_COMPILE_STATUS, &compile_err);
       if (!compile_err) {  // Output error log
         glGetShaderInfoLog(shader_program, sizeof(err_info_log), nullptr, err_info_log);
-        fprintf(stderr, "ERROR: %s\n%s\n", enum_type_map[compile_option], err_info_log);
+        std::print(stderr, "ERROR: {}\n{}\n", enum_type_map[compile_option], err_info_log);
       }
     }  // Else compile vertex or fragment or geometry shader
     else {
       glGetProgramiv(shader_program, GL_LINK_STATUS, &compile_err);
       if (!compile_err) {  // Output error log
         glGetProgramInfoLog(shader_program, 1024, nullptr, err_info_log);
-        fprintf(stderr, "ERROR: %s\n%s\n", enum_type_map[compile_option], err_info_log);
+        std::print(stderr, "ERROR: {}\n{}\n", enum_type_map[compile_option], err_info_log);
       }
     }
   }

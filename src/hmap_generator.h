@@ -20,6 +20,7 @@
 #include <time.h>
 
 #include <map>
+#include <print>
 #include <string>
 
 #define _ALLOCATION_FAILED_ 1
@@ -85,7 +86,7 @@ struct HeightMapParams : public MapParams {
     if (it != (*this).end())
       return *reinterpret_cast<T*>(it->second);
     else {  // Report problem and throw exceptions if the key does not exist
-      fprintf(stderr, "ERROR: Missing parameter %s.\n", param_name.c_str());
+      std::print(stderr, "ERROR: Missing parameter {}.\n", param_name);
       throw param_name;
     }
   }
@@ -155,7 +156,7 @@ class HeightMapGeneratorBase {
         }
       }
     } catch (const std::bad_alloc& err) {  // Catch the allocation error
-      fprintf(stderr, "ERROR: Allocation failed!\n");
+      std::print(stderr, "ERROR: Allocation failed!\n");
       exit(1);
     }
 
@@ -308,7 +309,7 @@ class CircleStrikeGenerator : public HeightMapGeneratorBase {
           *col_ptr = 0.0f;
       }
     } catch (const std::bad_alloc& err) {  // Catch the allocation error
-      fprintf(stderr, "ERROR: Allocation failed!\n");
+      std::print(stderr, "ERROR: Allocation failed!\n");
       exit(1);
     }
 
@@ -501,7 +502,7 @@ class PerlinNoiseGenerator : public HeightMapGeneratorBase {
           *col_ptr = 0.0f;
       }
     } catch (const std::bad_alloc& err) {  // Catch the allocation error
-      fprintf(stderr, "ERROR: Allocation failed!\n");
+      std::print(stderr, "ERROR: Allocation failed!\n");
       exit(1);
     }
 
@@ -561,7 +562,7 @@ class PerlinNoiseGenerator : public HeightMapGeneratorBase {
           *col_ptr = (GLfloat)rand() / RAND_MAX;
       }
     } catch (const std::bad_alloc& err) {  // Catch the allocation error
-      fprintf(stderr, "ERROR: Allocation failed!\n");
+      std::print(stderr, "ERROR: Allocation failed!\n");
       exit(1);
     }
 
@@ -627,7 +628,7 @@ class PerlinNoiseGenerator : public HeightMapGeneratorBase {
         }
       }
     } catch (const std::bad_alloc& err) {  // Catch the allocation error
-      fprintf(stderr, "ERROR: Allocation failed!\n");
+      std::print(stderr, "ERROR: Allocation failed!\n");
       exit(1);
     }
 

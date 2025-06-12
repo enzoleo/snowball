@@ -17,6 +17,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
+#include <print>
 #include <string>
 #include <vector>
 
@@ -139,8 +140,8 @@ class Terrain : public Object {
     GLuint wgrid = (GLuint)(xterrain / cell_size);
     if (hgrid < 0 || hgrid >= cells - 1 ||
         wgrid < 0 || wgrid >= cells - 1) {  // Wrong position
-      fprintf(stderr, "ERROR: Illegal parameter.\n");
-      fprintf(stderr, "In function `GLfloat getAltitude(const GLfloat&, const GLfloat&)`.\n");
+      std::print(stderr, "ERROR: Illegal parameter.\n");
+      std::print(stderr, "In function `GLfloat getAltitude(const GLfloat&, const GLfloat&)`.\n");
       exit(_VECTOR_ILLEGAL_SIZE_);
     }
 
@@ -174,7 +175,7 @@ class Terrain : public Object {
         heights[hloop] = new GLfloat[cells];
       }
     } catch (const std::bad_alloc& err) {  // Allocation failed (catch exception)
-      fprintf(stderr, "Allocation failed.\n");
+      std::print(stderr, "Allocation failed.\n");
       exit(_ALLOCATION_FAILED_);
     }
 
@@ -184,7 +185,6 @@ class Terrain : public Object {
 
     // --------------------------------------------------------------------------------------
     // Compute vertices(positions), normals and texture coordinates
-
     computeBufferObjects();
 
     // Computation Ended! Bind VAO, VBO and EBO before draw this terrain
@@ -197,7 +197,7 @@ class Terrain : public Object {
 #endif
 #ifdef _TERRAIN_NORMAL_SAVE_
     saveNormalMap("../assets/terrains/normal_map.png");
-    printf("Normal Map Saved Successfully!\n");
+    std::print("Normal Map Saved Successfully!\n");
 #endif
   }
 
@@ -363,7 +363,7 @@ class Terrain : public Object {
   ** The function to save normal map */
   GLint saveNormalMap(const std::string& filename) {
     if (normals.size() != cells * cells) {  // Check the normal vector size
-      fprintf(stderr, "ERROR: The size of normals: %lu", normals.size());
+      std::print(stderr, "ERROR: The size of normals: {}", normals.size());
       exit(_VECTOR_ILLEGAL_SIZE_);
     }
 
@@ -393,7 +393,7 @@ class Terrain : public Object {
 
   /* PRIVATE MEMBER
   ** The number of cells on each edge (the same in each edge) */
-  GLuint cells;
+  GLuint cells = 256;
 
   /* PRIVATE MEMBER
   ** @param vertices: The vector of vertices

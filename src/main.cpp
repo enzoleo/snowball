@@ -19,7 +19,6 @@
 #include "particle_system.h"
 #include "shader.hpp"
 #include "shadow_map.h"
-#include "terrain.h"
 #include "texture.h"
 #include "util.h"
 
@@ -519,8 +518,8 @@ void updateScene() {
       if (currentX < safePositionX - 1.2f ||
           currentX > safePositionX + 1.2f ||
           snowball.getRadius() < 0.05f) {
-        printf("Game over!\n");
-        printf("Your score: %d\n", score);
+        std::print("Game over!\n");
+        std::print("Your score: {}\n", score);
         bTemp = !bTemp;
         bGameOver = !bGameOver;
       }
@@ -532,8 +531,8 @@ void updateScene() {
       } else if (currentX < safePositionX - 1.2f ||
                  currentX > safePositionX + 1.2f ||
                  snowball.getRadius() < 0.05f) {
-        printf("Game over!\n");
-        printf("Your score: %d\n", score);
+        std::print("Game over!\n");
+        std::print("Your score: {}\n", score);
         bTemp = !bTemp;
         bGameOver = !bGameOver;
       }
